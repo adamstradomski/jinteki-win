@@ -8,6 +8,6 @@
     "test": "node --test \"test/**/*.test.mjs\" \"market-research/tests/ui/*.test.mjs\""
   },
   "devDependencies": {
-    "wrangler": "^4.146.0"
+    "wrangler": "^4.149.0"
   }
 }
