@@ -1,0 +1,36 @@
+/* Proposal C: build a server, rank rigs. */
+.c-layout { display: grid; grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); gap: var(--space-4); align-items: start; }
+.c-stack { list-style: none; margin: var(--space-3) 0; padding: 0; display: flex; flex-direction: column; gap: 6px; counter-reset: ice; }
+.c-stack li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; background: var(--panel-2); border: 1px solid var(--line); border-left: 3px solid var(--fc, var(--line)); }
+.c-stack li::before { counter-increment: ice; content: counter(ice); font-family: var(--font-mono); font-size: 11px; color: var(--dim); }
+.c-stack .t { font-weight: 600; font-size: 14px; }
+.c-stack .m { display: block; font-family: var(--font-mono); font-size: 11px; color: var(--dim); }
+.c-stack .x { all: unset; cursor: pointer; font-family: var(--font-mono); color: var(--dim); padding: 0 6px; }
+.c-stack .x:hover, .c-stack .x:focus-visible { color: var(--neg); outline: 1px solid var(--neg); }
+.c-stack:empty::after { content: "No ice yet: add some below or try a preset."; color: var(--dim); font-size: 13px; }
+.c-add .input { width: 100%; box-sizing: border-box; }
+.c-browse { margin-top: var(--space-3); }
+.c-browse summary, .c-settings summary { cursor: pointer; font-family: var(--font-mono); font-size: 12px; color: var(--accent); }
+.c-tiles { display: flex; flex-wrap: wrap; gap: 4px; margin-top: var(--space-2); max-height: 320px; overflow: auto; }
+.c-tiles button { font-size: 11px; height: auto; min-height: 22px; padding: 2px 8px; }
+
+.c-results { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.c-rig { border: 1px solid var(--line); background: var(--panel-2); padding: 10px 12px; }
+.c-rig .top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.c-rig .total { font-family: var(--font-mono); font-size: 22px; color: var(--accent); font-variant-numeric: tabular-nums; }
+[data-theme^="jnet"] .c-rig .total { font-family: var(--font-display); font-size: 28px; font-weight: 800; }
+.c-rig .names { font-weight: 600; }
+.c-rig .meta { font-family: var(--font-mono); font-size: 11px; color: var(--dim); }
+.c-rig ol { list-style: none; margin: 6px 0 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; font-size: 12.5px; }
+.c-rig ol .how { font-family: var(--font-mono); font-size: 11px; color: var(--dim); text-align: right; margin-left: 6px; }
+.c-rig.rank-1 { border-color: var(--accent-dim); }
+.c-settings { margin-top: var(--space-4); }
+.c-settings summary.panel-header { list-style: none; }
+.b-settings { columns: 2 280px; column-gap: var(--space-4); }
+.b-settings .bb-setting, .b-settings .bb-check { break-inside: avoid; }
+
+@media (max-width: 900px) {
+  .c-layout { grid-template-columns: minmax(0, 1fr); }
+  .c-rig ol { grid-template-columns: minmax(0, 1fr); }
+  .c-rig ol .how { text-align: left; margin-bottom: 4px; }
+}

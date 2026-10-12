@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<title>Breaker Bay · B: Breaker cards · jinteki.win</title>
+<link rel="stylesheet" href="../../shared/jw/tokens.css">
+<link rel="stylesheet" href="../../shared/jw/bundle.css">
+<link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="b.css">
+<script src="../../shared/jw/bundle.js"></script>
+<script src="../../market-research/theme-init.js"></script>
+<script type="module" src="b.js"></script>
+</head>
+<body class="jw-page">
+<div class="jw-wrap bb-wrap">
+  <header class="bb-header">
+    <div class="bb-topline">
+      <div class="kicker"><a href="../../">jinteki.win</a> / breaker-bay</div>
+      <div class="jw-controls"><div id="theme-switcher"></div><div id="mode-toggle"></div></div>
+    </div>
+    <h1 class="jw-title">Breaker Bay</h1>
+    <p class="lede">What it costs to get through every piece of Standard ice with every icebreaker.</p>
+    <span class="badge bb-proposal">Proposal B · Breaker cards</span>
+  </header>
+
+  <section class="panel b-controls" aria-labelledby="controls-title">
+    <div class="panel-header"><h2 id="controls-title">Compare</h2></div>
+    <div class="panel-body">
+      <div class="bb-chips" id="breaker-types"><span class="label">Breakers</span></div>
+      <div class="bb-chips" id="factions"><span class="label">Faction</span></div>
+      <div class="bb-chips"><span class="label">Sort</span>
+        <button type="button" class="btn chip" data-sort="median" aria-pressed="true">Median cost</button>
+        <button type="button" class="btn chip" data-sort="max" aria-pressed="false">Worst case</button>
+        <button type="button" class="btn chip" data-sort="install" aria-pressed="false">Install cost</button>
+        <button type="button" class="btn chip" data-sort="name" aria-pressed="false">Name</button></div>
+      <details class="b-more">
+        <summary>Support cards and ice settings <span class="badge" id="changed" hidden></span></summary>
+        <div id="settings" class="b-settings"></div>
+      </details>
+    </div>
+  </section>
+
+  <p class="bb-note b-scale" id="scale"></p>
+  <main class="b-grid" id="grid"></main>
+</div>
+</body>
+</html>
