@@ -1,6 +1,6 @@
 // Sortable data tables and the shared cells they use.
 import { sortRows } from './data.js';
-import { el } from './dom.js';
+import { el } from '../shared/dom.js';
 import { fmtInt, fmtPct, fmtPp } from './format.js';
 
 const TABLE_ROWS = 25;

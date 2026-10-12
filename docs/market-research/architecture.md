@@ -50,7 +50,7 @@ flowchart TB
 - **R2 buckets:** `mr-source` (source records, rewritten only when their hash changes),
   `mr-canonical` (tables and `state/`), `mr-published` (served read-only on `data.jinteki.win`).
 - **The page** is plain HTML, CSS and ES modules in `public/market-research/` (`app.js` and what it
-  imports: `data.js` for the arithmetic, `charts.js`, `table.js`, `combo.js`, `dom.js`, `format.js`),
+  imports: `data.js` for the arithmetic, `charts.js`, `table.js`, `combo.js`, `format.js`, and `../shared/dom.js`),
   served with the rest of jinteki.win by its existing Worker as static assets (no code runs for
   these paths).
 

@@ -1,4 +1,4 @@
-// DOM helpers for the Market Research page. Values go in as text nodes or textContent, never HTML.
+// DOM helpers shared by the Market Research and Breaker Bay pages. Values go in as text nodes or textContent, never HTML.
 
 const SVGNS = 'http://www.w3.org/2000/svg';
 

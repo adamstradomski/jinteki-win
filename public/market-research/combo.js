@@ -1,6 +1,6 @@
 // An accessible card-name combobox (listbox of suggestions, arrow keys, Enter, Escape).
 import { faction } from './data.js';
-import { el } from './dom.js';
+import { el } from '../shared/dom.js';
 
 /** A card-name combobox: `find(query)` returns catalog cards, `onPick(card)` handles a choice. */
 export function cardCombo(input, list, { find, onPick, clearOnPick = false }) {

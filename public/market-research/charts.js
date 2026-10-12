@@ -1,7 +1,7 @@
 // SVG charts for the Market Research page: the monthly line chart (trends, card detail) and the
 // popularity-vs-winrate scatter, plus the shared tooltip and axis helpers. Charts get their data
 // and colours from the caller; they read no page state.
-import { $, el, svg } from './dom.js';
+import { $, el, svg } from '../shared/dom.js';
 import { MINUS, fmtInt, fmtN, fmtPct, fmtPp, monthName, shortMonth } from './format.js';
 
 // ---------------------------------------------------------------- tooltip

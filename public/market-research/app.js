@@ -3,7 +3,7 @@
 // the panels to the table (table.js), chart (charts.js) and combobox (combo.js) components. Every
 // value is written with textContent (never innerHTML), even though snapshots carry no free text.
 import * as D from './data.js';
-import { $, el, debounce } from './dom.js';
+import { $, el, debounce } from '../shared/dom.js';
 import { MINUS, fmtInt, fmtN, fmtPct, fmtPp, fmtRatio, fmtNum, monthName } from './format.js';
 import { dataTable as table, changeCell, diffCell, meterCell } from './table.js';
 import { lineChart, scatterChart, niceAxis } from './charts.js';
