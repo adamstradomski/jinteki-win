@@ -1,4 +1,5 @@
 {
+ "card_fields": 1,
  "card_sets": [],
  "cards": [],
  "formats": [],
@@ -2927,7 +2928,7 @@
    "id": "36066"
   }
  ],
- "record_hash": "sha256:728c51a3527f84308e6e5e4184fb9d45b22e77a7df0642890d366403cc5d07d3",
+ "record_hash": "sha256:8c7caadb8adf6dbc8bd321144a8b0b89e4eb54ab76258d8eef43208b7f80c592",
  "restrictions": [],
  "schema": "nrdb.catalog/1",
  "snapshots": []

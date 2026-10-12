@@ -464,3 +464,35 @@ def test_interrupted_backfill_resumes_without_refetching(tmp_path, clock, monkey
     refetched = [u for u in again if u in done_first and not any(x in u for x in listing)]
     assert boom in again
     assert refetched == []
+
+
+def test_cards_stored_without_game_text_are_fetched_again_without_validators(tmp_path, clock):
+    env = make_env(tmp_path, clock)
+    run(env)
+    key = "nrdb/catalog/cards.json"
+    old = env.stores.source.get_json(key)
+    # A record written before the game text fields existed: no card_fields, no text.
+    old.pop("card_fields")
+    old["record_hash"] = "sha256:" + "0" * 64  # its hash covered fewer fields
+    for c in old["cards"]:
+        for f in ("cost", "strength", "memory_cost", "subtypes", "text"):
+            c.pop(f)
+    env.stores.source.put_json(key, old)
+    clock.advance(24 * 3600)
+    env.routes.calls.clear()
+    run(env)
+    req = [c for c in env.routes.calls if "/v3/public/cards" in str(c.url)]
+    assert req and "if-none-match" not in req[0].headers and "if-modified-since" not in req[0].headers
+    new = env.stores.source.get_json(key)
+    assert new["card_fields"] == 2
+    assert any(c["text"] for c in new["cards"])
+
+
+def test_cards_stored_with_game_text_are_not_fetched_again(tmp_path, clock):
+    # The cards list is fetched once (until a new set or ban list appears); a current record stays.
+    env = make_env(tmp_path, clock)
+    run(env)
+    clock.advance(24 * 3600)
+    env.routes.calls.clear()
+    run(env)
+    assert not [c for c in env.routes.calls if "/v3/public/cards" in str(c.url)]

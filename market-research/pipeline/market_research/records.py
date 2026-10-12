@@ -274,6 +274,12 @@ class CatCard(Part):
     is_unique: bool = False
     card_pool_ids: list[str] = []
     printing_ids: list[str] = []
+    # Game text fields for Breaker Bay (catalog card_fields 2 and later). "X" is a variable cost.
+    cost: int | Literal["X"] | None = None
+    strength: int | None = None
+    memory_cost: int | None = None
+    subtypes: list[str] = []
+    text: str = ""
 
 
 class CatPrinting(Part):
@@ -336,6 +342,9 @@ class NrdbCatalog(Record):
     formats: list[CatFormat] = []
     restrictions: list[CatRestriction] = []
     snapshots: list[CatSnapshot] = []
+    # Which CatCard fields a cards record was parsed with: 1 had no game text, 2 has it. Ingest
+    # fetches the cards again, ignoring the stored validators, while the stored record is older.
+    card_fields: int = 1
     record_hash: str = ""
 
     model_config = ConfigDict(extra="forbid", frozen=True, populate_by_name=True)

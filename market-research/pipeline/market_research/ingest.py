@@ -225,6 +225,11 @@ class Ingestor:
             self.enqueue(f"nrdb:catalog:{k}", "nrdb", "nrdb_catalog", k, priority=pr + 1)
         for k in ("cards", "printings"):
             self.enqueue(f"nrdb:catalog:{k}", "nrdb", "nrdb_catalog_bulk", k, priority=pr)
+        if self._stale_card_fields():
+            # The stored cards lack fields added since. The bulk item is fetched once and NRDB would
+            # answer 304, so it is fetched again in full, without validators.
+            with self._lock:
+                self.frontier.reopen("nrdb:catalog:cards", self.now, priority=pr)
         if self.backfill:
             # A backfill may reach further back than earlier runs did, so it always re-reads the full
             # ABR list and the Cobra index, even if a recent run already completed them.
@@ -873,6 +878,10 @@ class Ingestor:
                 etag=etag,
                 last_modified=lm,
             )
+
+    def _stale_card_fields(self) -> bool:
+        stored = self.read("nrdb/catalog/cards.json")
+        return isinstance(stored, dict) and int(stored.get("card_fields") or 1) < nrdb.CARD_FIELDS
 
     def h_nrdb_by_date(self, it: Item) -> None:
         d = date.fromisoformat(it.entity_id)

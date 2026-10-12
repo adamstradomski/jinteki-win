@@ -11,7 +11,7 @@ import pytest
 from market_research.http import HttpResult
 from market_research.records import CobraTournament, DeckVisibility
 from market_research.scrub import IngestQuality
-from market_research.sources import abr, cobra
+from market_research.sources import abr, cobra, nrdb
 from market_research.sources.common import (
     NotFound,
     ParseError,
@@ -282,3 +282,60 @@ def test_cobra_cut_in_progress_is_taken_from_elimination_pairings_by_seed():
 
 def test_cobra_without_elimination_games_nobody_made_the_cut():
     assert set(_cut_ranks(_nrtm([], [])).values()) == {None}
+
+
+def _nrdb_card(**extra):
+    a = {"id": "corroder", "title": "Corroder", "side_id": "runner", "card_type_id": "program"}
+    a["faction_id"] = "anarch"
+    return {"id": a["id"], "type": "cards", "attributes": {**a, **extra}}
+
+
+def test_nrdb_card_keeps_the_game_text_fields():
+    cat = nrdb.parse_catalog(
+        "cards",
+        [
+            _nrdb_card(
+                cost="2",
+                strength=2,
+                memory_cost=1,
+                card_subtype_ids=["icebreaker", "fracter"],
+                text="Interface → 1[credit]: Break 1 barrier subroutine.",
+            )
+        ],
+        IngestQuality(),
+    )
+    c = cat.cards[0]
+    assert (c.cost, c.strength, c.memory_cost) == (2, 2, 1)
+    assert c.subtypes == ["fracter", "icebreaker"]
+    assert c.text == "Interface → 1[credit]: Break 1 barrier subroutine."
+    assert cat.card_fields == nrdb.CARD_FIELDS == 2
+
+
+def test_nrdb_card_cost_x_and_missing_values():
+    # NRDB sends costs as strings, "X" for a variable cost, and null strength on non-ice cards.
+    cat = nrdb.parse_catalog("cards", [_nrdb_card(cost="X", strength=None)], IngestQuality())
+    c = cat.cards[0]
+    assert (c.cost, c.strength, c.memory_cost, c.subtypes, c.text) == ("X", None, None, [], "")
+    assert nrdb.parse_catalog("cards", [_nrdb_card(cost=None)], IngestQuality()).cards[0].cost is None
+    assert nrdb.parse_catalog("cards", [_nrdb_card(cost="x")], IngestQuality()).cards[0].cost == "X"
+
+
+def test_nrdb_card_with_an_unreadable_game_value_keeps_the_card():
+    # One odd value drops that value, not the card or the whole catalog.
+    cat = nrdb.parse_catalog(
+        "cards", [_nrdb_card(cost="2.5", strength="?", memory_cost="٣")], IngestQuality()
+    )
+    c = cat.cards[0]
+    assert (c.id, c.cost, c.strength, c.memory_cost) == ("corroder", None, None, None)
+
+
+def test_nrdb_card_text_is_capped():
+    cat = nrdb.parse_catalog("cards", [_nrdb_card(text="x" * 5000)], IngestQuality())
+    assert len(cat.cards[0].text) == nrdb.TEXT_MAX
+
+
+def test_only_cards_records_carry_the_card_fields_version():
+    rec = nrdb.parse_catalog(
+        "card_sets", [{"id": "elevation", "attributes": {"name": "Elevation"}}], IngestQuality()
+    )
+    assert rec.card_fields == 1

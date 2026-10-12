@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import date
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import ValidationError
 
@@ -50,6 +50,9 @@ CATALOG_KINDS: tuple[CatalogKind, ...] = (
     "cards",
     "printings",
 )
+# The CatCard fields cards records are parsed with now (NrdbCatalog.card_fields).
+CARD_FIELDS = 2
+TEXT_MAX = 2000
 # 500 keeps each page near 2.2 MB, well under max_response_bytes (1000 is already ~4.5 MB).
 PAGE_SIZE: dict[str, int] = {"cards": 500, "printings": 500}
 
@@ -120,6 +123,18 @@ def _opt_date(v: object) -> str | None:
     return parse_date(v) if v else None
 
 
+def _lenient_int(v: object) -> int | None:
+    """A game value that isn't a whole number is dropped, not the catalog."""
+    try:
+        return opt_int(v)
+    except ParseError:
+        return None
+
+
+def _cost(v: object) -> int | Literal["X"] | None:
+    return "X" if isinstance(v, str) and v.strip().upper() == "X" else _lenient_int(v)
+
+
 def _card(a: dict[str, Any]) -> CatCard:
     return CatCard(
         id=str(a["id"]),
@@ -135,6 +150,11 @@ def _card(a: dict[str, Any]) -> CatCard:
         is_unique=as_bool(a.get("is_unique")),
         card_pool_ids=_strs(a.get("card_pool_ids")),
         printing_ids=_strs(a.get("printing_ids")),
+        cost=_cost(a.get("cost")),
+        strength=_lenient_int(a.get("strength")),
+        memory_cost=_lenient_int(a.get("memory_cost")),
+        subtypes=_strs(a.get("card_subtype_ids")),
+        text=str(a.get("text") or "")[:TEXT_MAX],
     )
 
 
@@ -219,7 +239,10 @@ def parse_catalog(kind: CatalogKind, items: list[dict[str, Any]], q: IngestQuali
             rows.append(build(a))
         except (KeyError, ValidationError) as e:
             raise ParseError(f"bad {kind} item") from e
-    return NrdbCatalog.model_validate({"kind": kind, kind: sorted(rows, key=lambda r: r.id)}).hashed()
+    body: dict[str, Any] = {"kind": kind, kind: sorted(rows, key=lambda r: r.id)}
+    if kind == "cards":
+        body["card_fields"] = CARD_FIELDS
+    return NrdbCatalog.model_validate(body).hashed()
 
 
 def fetch_catalog(

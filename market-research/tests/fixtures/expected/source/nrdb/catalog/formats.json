@@ -1,4 +1,5 @@
 {
+ "card_fields": 1,
  "card_sets": [],
  "cards": [],
  "formats": [
@@ -35,7 +36,7 @@
  ],
  "kind": "formats",
  "printings": [],
- "record_hash": "sha256:89163b1b9703e006fd0ee2887b3130eb7d654160cbc161ed459320c721b154da",
+ "record_hash": "sha256:eee7e1b3b3706345ca7550f33a9f9fb9dc6ac8db7217b08dabfec856bdf761db",
  "restrictions": [],
  "schema": "nrdb.catalog/1",
  "snapshots": []

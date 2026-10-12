@@ -1,10 +1,11 @@
 {
+ "card_fields": 1,
  "card_sets": [],
  "cards": [],
  "formats": [],
  "kind": "restrictions",
  "printings": [],
- "record_hash": "sha256:26f6c1e5c49cd3efd9714e5648b6e4557c24cb9d3c6bc1b55056553b52fbb10e",
+ "record_hash": "sha256:adede699c02296fe3645d9064e7c9a681921542157e4d014eca2284e47a7fcfb",
  "restrictions": [
   {
    "date_start": "2026-08-01",

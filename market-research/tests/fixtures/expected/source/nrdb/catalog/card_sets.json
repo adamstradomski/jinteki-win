@@ -1,4 +1,5 @@
 {
+ "card_fields": 1,
  "card_sets": [
   {
    "card_cycle_id": "ashes",
@@ -71,7 +72,7 @@
  "formats": [],
  "kind": "card_sets",
  "printings": [],
- "record_hash": "sha256:ce70453def9e4c8dc117d556c9cda7ad97fc32733623835fe1c769189d756f8f",
+ "record_hash": "sha256:469f39342fe136a6a725c7594ed52b3769fd5d60ab7eb5528baac4f7ef69e3e8",
  "restrictions": [],
  "schema": "nrdb.catalog/1",
  "snapshots": []
