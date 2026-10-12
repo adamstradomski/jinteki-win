@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://data.jinteki.win https://cloudflareinsights.com; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<title>Breaker Bay · jinteki.win</title>
+<meta name="description" content="What it costs to break every piece of NSG Netrunner Standard ice with every icebreaker, and which rig gets you into a server for the fewest credits.">
+<link rel="stylesheet" href="../shared/jw/tokens.css">
+<link rel="stylesheet" href="../shared/jw/bundle.css">
+<link rel="stylesheet" href="style.css">
+<script src="../shared/jw/bundle.js"></script>
+<script src="theme-init.js"></script>
+<script type="module" src="app.js"></script>
+</head>
+<body class="jw-page">
+<div class="jw-wrap bb-wrap">
+  <header class="bb-header">
+    <div class="bb-topline">
+      <div class="kicker"><a href="../">jinteki.win</a> / breaker-bay</div>
+      <div class="jw-controls"><div id="theme-switcher"></div><div id="mode-toggle"></div></div>
+    </div>
+    <h1 class="jw-title">Breaker Bay <span class="badge bb-beta">Beta</span></h1>
+    <p class="lede">What it costs to get through every piece of Standard ice with every icebreaker, and which rig gets you into a server for the fewest credits.</p>
+  </header>
+
+  <p id="status" class="bb-status" role="status" aria-live="polite">Loading the card pool…</p>
+
+  <div class="bb-layout" id="app" hidden>
+    <aside class="panel bb-settings" id="settings-panel" aria-labelledby="settings-title">
+      <div class="panel-header">
+        <h2 id="settings-title">Card settings</h2>
+        <div class="header-controls">
+          <span class="badge" id="changed" hidden></span>
+          <button type="button" class="btn secondary bb-settings-toggle" id="settings-toggle" aria-expanded="false" aria-controls="settings-body">Show</button>
+        </div>
+      </div>
+      <div class="panel-body bb-settings-body" id="settings-body">
+        <p class="bb-note">Counters, conditions and support cards. Each starts from what the card itself gives.</p>
+        <button type="button" class="btn secondary" id="settings-reset">Reset to card defaults</button>
+        <div id="settings"></div>
+      </div>
+    </aside>
+
+    <main class="bb-main">
+      <section class="panel" id="filters" aria-labelledby="filters-title">
+        <div class="panel-header"><h2 id="filters-title">Filters</h2>
+          <div class="header-controls"><button type="button" class="btn secondary" id="filters-reset">Reset filters</button></div></div>
+        <div class="panel-body">
+          <div class="bb-filter-grid">
+            <fieldset class="bb-group">
+              <legend>Breakers</legend>
+              <div class="bb-chips" id="f-bt" aria-label="Breaker types"></div>
+              <div class="bb-chips" id="f-bf" aria-label="Breaker factions"></div>
+              <div class="bb-chips">
+                <label class="field bb-inline">Stealth
+                  <select class="select" id="f-stealth">
+                    <option value="all">All breakers</option>
+                    <option value="only">Stealth only</option>
+                    <option value="none">No stealth</option>
+                  </select></label>
+                <button type="button" class="btn chip" id="f-special" aria-pressed="true" title="Breakers that only work in narrow situations: a host ice, a mark, one run, counters from accessing cards">Special breakers</button>
+                <button type="button" class="btn chip" id="f-variants" aria-pressed="true" title="Each situation that changes a breaker (an install turn, a successful run, a threat level) gets its own row">Variants</button>
+              </div>
+              <details class="bb-pick" id="pick-b">
+                <summary>Choose breakers <span class="badge" id="pick-b-count" hidden></span></summary>
+                <div class="bb-pick-body"></div>
+              </details>
+            </fieldset>
+            <fieldset class="bb-group">
+              <legend>Ice</legend>
+              <div class="bb-chips" id="f-it" aria-label="Ice types"></div>
+              <div class="bb-chips" id="f-if" aria-label="Ice factions"></div>
+              <div class="bb-chips">
+                <span class="field bb-inline">Rez cost
+                  <span class="bb-range"><input class="input" type="number" id="f-rez-min" min="0" max="99" inputmode="numeric" aria-label="Lowest rez cost"> –
+                  <input class="input" type="number" id="f-rez-max" min="0" max="99" inputmode="numeric" aria-label="Highest rez cost"></span></span>
+                <span class="field bb-inline">Strength
+                  <span class="bb-range"><input class="input" type="number" id="f-str-min" min="0" max="99" inputmode="numeric" aria-label="Lowest strength"> –
+                  <input class="input" type="number" id="f-str-max" min="0" max="99" inputmode="numeric" aria-label="Highest strength"></span></span>
+              </div>
+              <details class="bb-pick" id="pick-i">
+                <summary>Choose ice <span class="badge" id="pick-i-count" hidden></span></summary>
+                <div class="bb-pick-body"></div>
+              </details>
+            </fieldset>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="table-panel" aria-labelledby="table-title">
+        <div class="panel-header"><h2 id="table-title">Cost to break</h2>
+          <div class="header-controls">
+            <span class="bb-heat-legend" aria-hidden="true">cheap <span class="bar"></span> dear</span>
+            <button type="button" class="btn chip" id="swap" aria-pressed="false">Swap axes</button></div></div>
+        <div class="panel-body">
+          <p class="bb-note">Credits for one encounter: raise the breaker's strength to the ice's, then break every subroutine. An empty cell: the breaker doesn't interface with that ice or can't get through it. Tap a number to see how it adds up.</p>
+          <p class="bb-detail" id="detail" role="status" aria-live="polite"></p>
+          <div class="bb-scroll" id="table-scroll"><table class="data-table bb-table" id="table"></table></div>
+          <p class="bb-note bb-count" id="table-count"></p>
+        </div>
+      </section>
+
+      <section class="panel" id="planner" aria-labelledby="planner-title">
+        <div class="panel-header"><h2 id="planner-title">Run planner</h2></div>
+        <div class="panel-body bb-planner">
+          <div class="bb-server">
+            <h3>The server</h3>
+            <div class="bb-chips" id="presets"><span class="label">Try</span></div>
+            <ol class="bb-stack" id="stack" aria-label="Ice protecting the server, outermost first"></ol>
+            <label class="field">Add ice
+              <input class="input" id="add-ice" list="ice-list" placeholder="Type an ice name" autocomplete="off"></label>
+            <datalist id="ice-list"></datalist>
+            <button type="button" class="btn secondary bb-clear" id="clear-server">Clear the server</button>
+          </div>
+          <div class="bb-rigs">
+            <h3>Cheapest way in</h3>
+            <div class="bb-chips" id="rig-size"><span class="label">Rig</span></div>
+            <p class="bb-note" id="rig-note"></p>
+            <ol class="bb-results" id="rigs"></ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="unmodelled-panel" aria-labelledby="unmodelled-title" hidden>
+        <div class="panel-header"><h2 id="unmodelled-title">Not costed</h2></div>
+        <div class="panel-body"><ul class="bb-unmodelled" id="unmodelled"></ul></div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="jw-footer bb-footer">
+    <p id="version"></p>
+    <p>Card data from <a href="https://netrunnerdb.com" rel="noopener">NetrunnerDB</a>; how each breaker breaks is curated by hand.
+      Spotted a wrong cost? <a href="https://github.com/adamstradomski/jinteki-analyzer/issues/new?title=Breaker%20Bay%3A%20" rel="noopener" target="_blank">Tell us on GitHub</a>.</p>
+    <p>Fan project, not affiliated with Null Signal Games. <a href="../">Back to jinteki.win</a></p>
+  </footer>
+</div>
+</body>
+</html>

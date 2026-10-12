@@ -2,7 +2,7 @@
   "name": "jinteki-analyzer",
   "private": true,
   "type": "module",
-  "description": "jinteki.win: the Trace log analyzer, Market Research page and link shortener Worker",
+  "description": "jinteki.win: the Trace log analyzer, Market Research and Breaker Bay pages and link shortener Worker",
   "scripts": {
     "build": "node scripts/render-config.mjs",
     "test": "node --test \"test/**/*.test.mjs\" \"market-research/tests/ui/*.test.mjs\""

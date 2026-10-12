@@ -1,9 +1,10 @@
 # jinteki.win
 
-Netrunner tools on [jinteki.win](https://jinteki.win/). The landing page at `/` links to all three:
+Netrunner tools on [jinteki.win](https://jinteki.win/). The landing page at `/` links to all four:
 
 - **Trace** (`/trace/`): a single-page, client-side log analyzer for [jinteki.net](https://jinteki.net) games, described below.
 - **Market Research** (`/market-research/`): card meta from NSG Netrunner Standard tournaments. See [docs/market-research/](docs/market-research/).
+- **Breaker Bay** (`/breaker-bay/`): what it costs to break every piece of Standard ice with every icebreaker, and a run planner that ranks rigs for a server. Described below.
 - **Cobra Bot** (`/cobra-bot/`): a static page about the Cobra Discord bot, described below.
 
 Trace: Paste (or bookmarklet-import) a finished game's chat log and get parsed stats, per-turn charts, and a per-card credit/cost breakdown — no server, no accounts, nothing leaves your browser unless you explicitly opt in.
@@ -53,7 +54,32 @@ Run from the repository root. The Market Research pipeline has its own CLI, docu
 | `node --test test/worker/*.test.mjs` | Unit tests for the link shortener Worker in `src/`, with in-memory fakes for D1 and the other bindings (also run in CI). |
 | `node --test test/trace/*.test.mjs` | Trace's parser tests: the golden files (`UPDATE_GOLDEN=1` rewrites them), the hand-written log cases and the achievements (also run in CI). |
 | `node --test test/scripts/*.test.mjs` | Tests for the build scripts (`render-config`, `stamp-build`, `build-bookmarklet`, `build-tokens`); each runs a copy of its script in a temporary directory, so the repo is never touched. Also checks that `tokens.css` is what `build-tokens.mjs` generates. |
+| `node --test test/breaker-bay/*.test.mjs` | Tests Breaker Bay's model (`public/breaker-bay/model.js`): costs, filters, the run planner and the address, on small hand-built pools and on the pipeline's golden `breaker-bay/pool.json` (also run in CI). |
 | `node --test market-research/tests/ui/*.test.mjs` | Tests the Market Research page's data module against the pipeline's reference snapshot (also run in CI). |
+
+## Breaker Bay
+
+`/breaker-bay/` reads the newest Market Research snapshot from `data.jinteki.win`: `manifest.json`, then the
+file its `paths.breaker_bay` names (`breaker-bay/pool.json`), which the pipeline builds from the NetrunnerDB card
+pool and hand-curated breaker data ([spec](docs/breaker-bay/spec.md), [data format](docs/breaker-bay/data-format.md)).
+Everything else happens in the browser.
+
+- `public/breaker-bay/model.js` holds every rule (no DOM): the cost of one encounter (pump to the ice's strength
+  after every modifier, then break every subroutine, by the cheapest mix of the breaker's abilities), the filters,
+  the run planner's rig ranking, and the address. `app.js` only draws; `index.html` and `style.css` use the design
+  system and its CSP rules (no inline scripts or `style` attributes).
+- **Cost table:** ice × breakers, one encounter per cell. Filters by breaker and ice type and faction, stealth,
+  rez cost and strength ranges, variants, special breakers (`special` in the data), and an explicit choice of
+  breakers or ice that overrides the type and faction filters. Card settings (counters, conditions, support cards)
+  start from what each card gives.
+- **Run planner:** stack a server's ice; it ranks rigs of up to three breakers (one per fracter, decoder, killer
+  and AI slot) by the credits for one run, with counters spent on one piece of ice gone for the next.
+- **Address:** every filter and setting that differs from the desktop defaults is kept in the hash, e.g.
+  `#bf=criminal&b=buzzsaw,corsair&p=hantu.virus.4&srv=tree_line,pharos`; unknown parts are dropped. A phone with no
+  hash starts with fracters and barriers.
+- **Local preview:** serve the repository root (`python -m http.server 5318`) and open
+  `/public/breaker-bay/?data=/market-research/tests/fixtures/expected/snapshot/` for the pipeline's golden snapshot;
+  `?data=` accepts only a same-origin path.
 
 ## Deployment
 
