@@ -92,6 +92,11 @@ Built in stage 2. Stage 3 adds the charts.
 
 ## Stages
 
+All three are built; the design proposals of stage 1 led to the page combining proposal A (the table, with
+faction filters and an explicit choice of breakers and ice) and proposal C (the run planner). The table costs one
+encounter per cell; the run planner carries spent counters from one piece of ice to the next. A switch leaves out
+special breakers (`special` in breakers.json).
+
 1. Data: the card fields in the catalog records, the curated files, `breaker-bay draft`, the
    `breaker-bay/cards.json` slice and its tests. Then several UI design proposals built on the real
    stage 1 data, for choosing a direction.

@@ -2,6 +2,7 @@
 // settings, the filters, the cost table and the run planner. Every rule lives in model.js.
 import * as M from './model.js';
 import { $, el, debounce } from '../shared/dom.js';
+import { drawBoxes, drawStrength, drawTreemap } from './charts.js';
 
 const PRESETS = [
   ['Weyland remote', ['tree_line', 'akhet', 'pharos']],
@@ -14,6 +15,8 @@ const base = M.dataBase(location.search);
 let pool;
 let state;
 let picked = null; // { row, ice } keys of the cell whose breakdown is shown
+let tile = null; // { faction, rez } of the treemap tile whose ice is listed
+let view = null; // what the table drew last: { cols, ice, grid, max }, for the charts
 
 // ---------------------------------------------------------------- helpers
 
@@ -71,6 +74,7 @@ async function boot() {
   setupPlanner();
   drawUnmodelled();
   drawAll();
+  window.addEventListener('resize', debounce(() => drawCharts(), 150));
   window.addEventListener('hashchange', () => {
     if (location.hash === M.formatHash(state)) return;
     state = M.parseHash(location.hash, pool, M.defaultState({ phone: phoneQuery.matches }));
@@ -391,6 +395,47 @@ function drawTable() {
   table.innerHTML = `${h}</tbody>`;
   table.querySelectorAll('button[data-c]').forEach((b) => heat(b.parentElement, Number(b.dataset.c), max));
   drawDetail(cols, sup);
+  view = { cols, ice, grid, max };
+  drawCharts();
+}
+
+// ---------------------------------------------------------------- charts (the table's view)
+
+function drawCharts() {
+  if (!view) return;
+  const { cols, ice, grid, max } = view;
+  drawBoxes($('boxes'), M.breakerSpread(cols, ice, grid), max);
+  const groups = M.iceByFactionAndRez(ice);
+  if (tile && !groups.some((g) => g.faction === tile.faction && g.rez.some((r) => String(r.rez) === String(tile.rez)))) tile = null;
+  drawTreemap($('treemap'), groups, M.squarify, (faction, rez) => {
+    tile = tile && tile.faction === faction && String(tile.rez) === String(rez) ? null : { faction, rez };
+    drawCharts();
+  }, tile);
+  drawIceList(ice, grid);
+  drawStrength($('strength'), M.strengthCounts(ice));
+}
+
+function drawIceList(ice, grid) {
+  const panel = $('ice-list-panel');
+  panel.hidden = !tile;
+  if (!tile) return;
+  const costs = M.iceCosts(ice, grid)
+    .filter((x) => x.ice.faction === tile.faction && String(typeof x.ice.rez === 'number' ? x.ice.rez : 'X') === String(tile.rez))
+    .sort((a, b) => (a.mean ?? 1e9) - (b.mean ?? 1e9) || a.ice.title.localeCompare(b.ice.title));
+  $('ice-list-title').textContent = `${M.FACTION_NAME[tile.faction]} ice at rez ${tile.rez}`;
+  const fmt = (v, d = 1) => (v == null ? '–' : String(Math.round(v * 10 ** d) / 10 ** d));
+  const head = el('tr', {}, ...['Ice', 'Type', 'Strength', 'Subs', 'Breakers through', 'Mean cost', 'Median cost', 'Cost ÷ rez']
+    .map((h, k) => el('th', { class: k > 1 ? 'num' : '', title: k === 7 ? 'Mean cost to break ÷ rez cost: above 1, breaking it costs the Runner more than rezzing it cost the Corp' : null }, h)));
+  const rows = costs.map((x) => el('tr', {},
+    el('td', { class: 'card' }, x.ice.title),
+    el('td', {}, x.state.types.map((t) => M.TYPE_NAME[t]).join(', ') || '–'),
+    el('td', { class: 'num' }, String(x.state.strength)),
+    el('td', { class: 'num' }, String(x.state.subs)),
+    el('td', { class: 'num' }, `${x.n} of ${view.cols.length}`),
+    el('td', { class: 'num' }, fmt(x.mean)),
+    el('td', { class: 'num' }, fmt(x.median)),
+    el('td', { class: 'num' }, fmt(x.efficiency, 2))));
+  $('ice-costs').replaceChildren(el('thead', {}, head), el('tbody', {}, ...rows));
 }
 
 function drawDetail(cols, sup) {

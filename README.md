@@ -66,12 +66,16 @@ Everything else happens in the browser.
 
 - `public/breaker-bay/model.js` holds every rule (no DOM): the cost of one encounter (pump to the ice's strength
   after every modifier, then break every subroutine, by the cheapest mix of the breaker's abilities), the filters,
-  the run planner's rig ranking, and the address. `app.js` only draws; `index.html` and `style.css` use the design
+  the run planner's rig ranking, the chart data (spreads, a squarified treemap layout, strength counts), and the
+  address. `app.js` and `charts.js` only draw; `index.html` and `style.css` use the design
   system and its CSP rules (no inline scripts or `style` attributes).
 - **Cost table:** ice × breakers, one encounter per cell. Filters by breaker and ice type and faction, stealth,
   rez cost and strength ranges, variants, special breakers (`special` in the data), and an explicit choice of
   breakers or ice that overrides the type and faction filters. Card settings (counters, conditions, support cards)
   start from what each card gives.
+- **Charts** (`charts.js`, hand-written SVG, over the same view as the table): the cost per breaker as a box
+  plot (breakers reaching under half their matching ice last), ice by faction and rez cost as a treemap (a tile
+  lists its ice with the mean and median cost to break and mean cost ÷ rez), and ice strength per faction.
 - **Run planner:** stack a server's ice; it ranks rigs of up to three breakers (one per fracter, decoder, killer
   and AI slot) by the credits for one run, with counters spent on one piece of ice gone for the next.
 - **Address:** every filter and setting that differs from the desktop defaults is kept in the hash, e.g.

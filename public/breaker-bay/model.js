@@ -488,3 +488,121 @@ export function parseHash(hash, pool, fallback = defaultState()) {
   }
   return s;
 }
+
+// ---------------------------------------------------------------- charts
+
+/** Per breaker row, the credits of every piece of ice in view it gets through, with quartiles and
+ *  how many of that ice it interfaces with; sorted by median, then by reach (more first), then name.
+ *  Rows that get through under half their matching ice come last: Audrey's 0c median over the one
+ *  piece of ice it can afford says nothing about it. */
+export function breakerSpread(rows, ice, grid) {
+  const low = (x) => (x.values.length * 2 < x.matching ? 1 : 0);
+  return rows
+    .map((row, ri) => {
+      const matching = ice.filter((x) => interfaces(row, x.state.types)).length;
+      const values = ice.map((_, ii) => grid[ii][ri]).filter(Boolean).map((r) => r.credits);
+      return { row, values, q: quartiles(values), matching };
+    })
+    .filter((x) => x.values.length)
+    .sort((a, b) => low(a) - low(b) || a.q.med - b.q.med
+      || b.values.length / b.matching - a.values.length / a.matching
+      || a.row.label.localeCompare(b.row.label));
+}
+
+/** Per piece of ice in view, the credits over the breaker rows in view that get through it:
+ *  how many, mean, median, and efficiency = mean cost to break ÷ rez cost (null for rez 0 or X). */
+export function iceCosts(ice, grid) {
+  return ice.map((x, ii) => {
+    const q = quartiles(grid[ii].filter(Boolean).map((r) => r.credits));
+    const rez = typeof x.ice.rez === 'number' && x.ice.rez > 0 ? x.ice.rez : null;
+    return {
+      ice: x.ice,
+      state: x.state,
+      n: q ? q.n : 0,
+      mean: q ? q.mean : null,
+      median: q ? q.med : null,
+      efficiency: q && rez ? q.mean / rez : null,
+    };
+  });
+}
+
+/** Treemap groups: faction → rez cost → ice, with counts; factions in CORP_FACTIONS order, rez
+ *  costs ascending with X last. */
+export function iceByFactionAndRez(ice) {
+  const byFaction = new Map();
+  for (const x of ice) {
+    const rez = typeof x.ice.rez === 'number' ? x.ice.rez : 'X';
+    if (!byFaction.has(x.ice.faction)) byFaction.set(x.ice.faction, new Map());
+    const byRez = byFaction.get(x.ice.faction);
+    if (!byRez.has(rez)) byRez.set(rez, []);
+    byRez.get(rez).push(x);
+  }
+  const rank = (r) => (r === 'X' ? Infinity : r);
+  return [...byFaction.entries()]
+    .sort((a, b) => CORP_FACTIONS.indexOf(a[0]) - CORP_FACTIONS.indexOf(b[0]))
+    .map(([faction, byRez]) => ({
+      faction,
+      count: [...byRez.values()].reduce((n, l) => n + l.length, 0),
+      rez: [...byRez.entries()].sort((a, b) => rank(a[0]) - rank(b[0])).map(([rez, list]) => ({ rez, count: list.length, ice: list })),
+    }));
+}
+
+/**
+ * Squarified treemap (Bruls, Huizing and van Wijk): one rectangle per weight, in the order given,
+ * filling box { x, y, w, h } with areas proportional to the weights and sides as close to square
+ * as each row allows. Weights that aren't positive get an empty rectangle.
+ */
+export function squarify(weights, box) {
+  const empty = () => ({ x: box.x, y: box.y, w: 0, h: 0 });
+  const total = weights.reduce((a, b) => a + (b > 0 ? b : 0), 0);
+  const out = weights.map(empty);
+  if (!total || box.w <= 0 || box.h <= 0) return out;
+  const scale = (box.w * box.h) / total;
+  const items = weights.map((v, i) => ({ i, a: v > 0 ? v * scale : 0 })).filter((x) => x.a > 0);
+  let { x, y, w, h } = box;
+  const worst = (row, side) => {
+    const s = row.reduce((t, r) => t + r.a, 0);
+    const max = Math.max(...row.map((r) => r.a));
+    const min = Math.min(...row.map((r) => r.a));
+    return Math.max((side * side * max) / (s * s), (s * s) / (side * side * min));
+  };
+  const lay = (row) => {
+    const s = row.reduce((t, r) => t + r.a, 0);
+    if (w >= h) {
+      const rw = s / h;
+      let yy = y;
+      for (const r of row) { const rh = r.a / rw; out[r.i] = { x, y: yy, w: rw, h: rh }; yy += rh; }
+      x += rw;
+      w -= rw;
+    } else {
+      const rh = s / w;
+      let xx = x;
+      for (const r of row) { const cw = r.a / rh; out[r.i] = { x: xx, y, w: cw, h: rh }; xx += cw; }
+      y += rh;
+      h -= rh;
+    }
+  };
+  let row = [];
+  for (const item of items) {
+    const side = Math.min(w, h);
+    if (!row.length || worst([...row, item], side) <= worst(row, side)) row.push(item);
+    else { lay(row); row = [item]; }
+  }
+  if (row.length) lay(row);
+  return out;
+}
+
+/** How many pieces of ice in view have each strength (after modifiers), per faction, on an axis
+ *  that always holds 0: from 0 (or the weakest, when support makes it negative) to the strongest. */
+export function strengthCounts(ice) {
+  if (!ice.length) return { strengths: [], factions: [] };
+  const vals = ice.map((x) => x.state.strength);
+  const lo = Math.min(0, ...vals);
+  const hi = Math.max(0, ...vals);
+  const strengths = Array.from({ length: hi - lo + 1 }, (_, k) => lo + k);
+  const factions = CORP_FACTIONS.filter((f) => ice.some((x) => x.ice.faction === f)).map((faction) => ({
+    faction,
+    counts: strengths.map((s) => ice.filter((x) => x.ice.faction === faction && x.state.strength === s).length),
+  }));
+  return { strengths, factions };
+}

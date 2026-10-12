@@ -101,6 +101,34 @@
         </div>
       </section>
 
+      <section class="panel" id="boxes-panel" aria-labelledby="boxes-title">
+        <div class="panel-header"><h2 id="boxes-title">Cost per breaker</h2></div>
+        <div class="panel-body">
+          <p class="bb-note">The credits each breaker in view needs for the ice in view it gets through: a box from the first to the third quartile, a line at the median, whiskers to the cheapest and the dearest, a dot per piece of ice. On the right, the median and how many of the matching ice it gets through.</p>
+          <div id="boxes"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="treemap-panel" aria-labelledby="treemap-title">
+        <div class="panel-header"><h2 id="treemap-title">Ice by rez cost</h2></div>
+        <div class="panel-body">
+          <p class="bb-note">The ice in view by faction and rez cost; a bigger tile means more ice at that cost. Choose a tile to list its ice with what the breakers in view need for it.</p>
+          <div id="treemap"></div>
+          <div id="ice-list-panel" hidden>
+            <h3 id="ice-list-title"></h3>
+            <div class="bb-scroll-x"><table class="data-table bb-ice-table" id="ice-costs"></table></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="strength-panel" aria-labelledby="strength-title">
+        <div class="panel-header"><h2 id="strength-title">Ice strength by faction</h2></div>
+        <div class="panel-body">
+          <p class="bb-note">How many pieces of ice in view each faction has at each strength, after advancement, counters and support cards.</p>
+          <div id="strength"></div>
+        </div>
+      </section>
+
       <section class="panel" id="planner" aria-labelledby="planner-title">
         <div class="panel-header"><h2 id="planner-title">Run planner</h2></div>
         <div class="panel-body bb-planner">

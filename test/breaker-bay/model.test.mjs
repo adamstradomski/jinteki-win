@@ -471,3 +471,105 @@ test('data comes from data.jinteki.win unless ?data= names a same-origin path', 
     assert.equal(M.dataBase(bad), M.DEFAULT_DATA_BASE, bad);
   }
 });
+
+// ---------------------------------------------------------------- charts
+
+const chartData = () => {
+  const s = M.defaultState();
+  const rows = M.filterRows(POOL, s);
+  const list = M.filterIce(POOL, s);
+  return { rows, list, grid: M.costGrid(rows, list, s, []) };
+};
+
+test('breaker spread: the costs each row reaches, sorted by median', () => {
+  const { rows, list, grid } = chartData();
+  assert.deepEqual(M.breakerSpread(rows, list, grid).map((x) => [x.row.key, x.values, x.matching]), [
+    ['vandal', [1, 1], 4], // wall and trap only: strength 2, no pump, one subroutine
+    ['corroder', [1, 4], 2], // wall 1; tower 3 pumps + 1 break
+    ['afterimage', [3], 1],
+  ]);
+});
+
+test('breaker spread puts rows reaching under half their matching ice last: at half, below', () => {
+  const { rows, list, grid } = chartData();
+  // Vandal reaches 2 of its 4: exactly half stays in median order. Reaching only the trap (1 of 4) does not.
+  const g = grid.map((r) => [...r]);
+  const vi = rows.findIndex((r) => r.key === 'vandal');
+  const wall = list.findIndex((x) => x.ice.id === 'wall');
+  g[wall][vi] = null;
+  assert.deepEqual(M.breakerSpread(rows, list, g).map((x) => x.row.key), ['corroder', 'afterimage', 'vandal']);
+});
+
+test('breaker spread leaves out rows that reach nothing', () => {
+  const { rows, list, grid } = chartData();
+  const none = grid.map((r) => r.map(() => null));
+  assert.deepEqual(M.breakerSpread(rows, list, none), []);
+});
+
+test('ice costs: how many, mean, median and mean ÷ rez over the rows that get through', () => {
+  const { list, grid } = chartData();
+  const by = Object.fromEntries(M.iceCosts(list, grid).map((x) => [x.ice.id, x]));
+  assert.deepEqual([by.wall.n, by.wall.mean, by.wall.median, by.wall.efficiency], [2, 1, 1, 1 / 3]);
+  assert.deepEqual([by.tower.n, by.tower.mean, by.tower.efficiency], [1, 4, 4 / 7]);
+});
+
+test('ice nobody gets through has no mean; rez 0 or X has no efficiency', () => {
+  const one = (extra, results) => M.iceCosts([{ ice: ice('x', ['barrier'], 1, 1, extra), state: {} }], [results])[0];
+  assert.deepEqual([one({}, [null]).n, one({}, [null]).mean], [0, null]);
+  assert.deepEqual([one({ rez: 0 }, [{ credits: 2 }]).mean, one({ rez: 0 }, [{ credits: 2 }]).efficiency], [2, null]);
+  assert.equal(one({ rez: 'X' }, [{ credits: 2 }]).efficiency, null);
+});
+
+test('treemap groups: factions in order, rez costs ascending, X last', () => {
+  const list = [
+    { ice: ice('a', ['barrier'], 1, 1, { faction: 'nbn', rez: 'X' }) },
+    { ice: ice('b', ['barrier'], 1, 1, { faction: 'nbn', rez: 2 }) },
+    { ice: ice('c', ['barrier'], 1, 1, { faction: 'jinteki', rez: 5 }) },
+    { ice: ice('d', ['barrier'], 1, 1, { faction: 'nbn', rez: 2 }) },
+  ];
+  assert.deepEqual(M.iceByFactionAndRez(list).map((f) => [f.faction, f.count, f.rez.map((r) => `${r.rez}:${r.count}`)]), [
+    ['jinteki', 1, ['5:1']],
+    ['nbn', 3, ['2:2', 'X:1']],
+  ]);
+});
+
+test('squarify fills the box with areas proportional to the weights', () => {
+  const weights = [6, 6, 4, 3, 2, 2, 1];
+  const r = M.squarify(weights, { x: 0, y: 0, w: 60, h: 40 });
+  r.forEach((x, i) => assert.ok(Math.abs(x.w * x.h - (weights[i] / 24) * 2400) < 1e-6, `area ${i}`));
+  for (const x of r) assert.ok(x.x >= -1e-9 && x.y >= -1e-9 && x.x + x.w <= 60 + 1e-9 && x.y + x.h <= 40 + 1e-9);
+  // No two rectangles overlap.
+  for (let a = 0; a < r.length; a++) for (let b = a + 1; b < r.length; b++) {
+    const ox = Math.min(r[a].x + r[a].w, r[b].x + r[b].w) - Math.max(r[a].x, r[b].x);
+    const oy = Math.min(r[a].y + r[a].h, r[b].y + r[b].h) - Math.max(r[a].y, r[b].y);
+    assert.ok(ox <= 1e-9 || oy <= 1e-9, `${a} overlaps ${b}`);
+  }
+});
+
+test('squarify: one weight takes the box', () => {
+  assert.deepEqual(M.squarify([5], { x: 1, y: 2, w: 10, h: 4 }), [{ x: 1, y: 2, w: 10, h: 4 }]);
+});
+
+test('squarify: zero and negative weights get nothing; an empty box or list gives nothing', () => {
+  const r = M.squarify([0, 3, -2], { x: 0, y: 0, w: 10, h: 10 });
+  assert.deepEqual(r.map((x) => x.w * x.h), [0, 100, 0]);
+  assert.deepEqual(M.squarify([1, 2], { x: 0, y: 0, w: 0, h: 10 }).map((x) => x.w), [0, 0]);
+  assert.deepEqual(M.squarify([], { x: 0, y: 0, w: 10, h: 10 }), []);
+});
+
+test('strength counts per faction run from 0 to the strongest ice', () => {
+  const list = [
+    { ice: { faction: 'nbn' }, state: { strength: 2 } },
+    { ice: { faction: 'nbn' }, state: { strength: 2 } },
+    { ice: { faction: 'jinteki' }, state: { strength: 3 } },
+  ];
+  assert.deepEqual(M.strengthCounts(list), {
+    strengths: [0, 1, 2, 3],
+    factions: [{ faction: 'jinteki', counts: [0, 0, 0, 1] }, { faction: 'nbn', counts: [0, 0, 2, 0] }],
+  });
+  assert.deepEqual(M.strengthCounts([]), { strengths: [], factions: [] });
+});
+
+test('strength counts start below 0 when support makes ice negative', () => {
+  assert.deepEqual(M.strengthCounts([{ ice: { faction: 'nbn' }, state: { strength: -1 } }]).strengths, [-1, 0]);
+});
