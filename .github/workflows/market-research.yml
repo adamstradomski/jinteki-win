@@ -5,12 +5,16 @@ on:
   push:
     paths:
       - "market-research/**"
+      # test_publish checks the documented snapshot contract against the package schemas.
+      - "docs/market-research/snapshot-contract/**"
       - "public/market-research/**"
       - "public/shared/jw/**"
       - ".github/workflows/market-research.yml"
   pull_request:
     paths:
       - "market-research/**"
+      # test_publish checks the documented snapshot contract against the package schemas.
+      - "docs/market-research/snapshot-contract/**"
       - "public/market-research/**"
       - "public/shared/jw/**"
       - ".github/workflows/market-research.yml"

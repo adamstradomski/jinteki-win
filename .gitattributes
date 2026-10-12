@@ -2,3 +2,7 @@
 # writes "\n". Without this, a Windows checkout with core.autocrlf=true gets CRLF copies and every
 # golden test fails there.
 test/trace/golden/*.json text eol=lf
+
+# Breaker Bay's curated files: `breaker-bay draft` writes them with "\n" and a test checks they are
+# exactly what it would write, so they stay LF on Windows checkouts too.
+market-research/pipeline/market_research/data/breaker_bay/*.json text eol=lf
