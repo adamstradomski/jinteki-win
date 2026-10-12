@@ -436,6 +436,10 @@
           "description": "Its abilities spend credits only from stealth cards.",
           "type": "boolean"
         },
+        "special": {
+          "description": "Why it only works in narrow situations (one host ice, a mark, a one-run program); the page can leave such breakers out.",
+          "type": "string"
+        },
         "params": {
           "$ref": "#/$defs/params"
         },

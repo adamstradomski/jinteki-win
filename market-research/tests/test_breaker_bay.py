@@ -202,6 +202,7 @@ BAD_FILES = {
         ),
         "variant ids repeat",
     ),
+    "empty_special": ("breakers", doc("breakers", {"c": brk(special="")}), "c: special"),
     "unmodelled_with_abilities": (
         "breakers",
         doc("breakers", {"c": brk(unmodelled="Doesn't break.")}),
@@ -658,3 +659,13 @@ def test_slice_is_in_the_published_snapshot_files_list():
     found = list((EXPECTED / "snapshot").glob("v=*/breaker-bay/pool.json"))
     assert len(found) == 1
     check(json.loads(found[0].read_text("utf-8")), "breaker_bay")
+
+
+def test_special_breaker_keeps_its_reason_in_the_slice():
+    cat = catalog([card("vandal", subtypes=["icebreaker", "ai"], strength=6)])
+    cur = bb.Curated(
+        breakers=bb.parse_file("breakers", doc("breakers", {"vandal": brk(special="Host ice only.")}))
+    )
+    out = bb.slice_file(bb.current_pool(cat, "r_new"), cur, "v", SCHEMAS["breaker_bay"])
+    assert out["breakers"][0]["model"]["special"] == "Host ice only."
+    check(out, "breaker_bay")

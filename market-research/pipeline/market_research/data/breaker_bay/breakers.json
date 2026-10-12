@@ -82,6 +82,7 @@
       "breaks": [
         "any"
       ],
+      "special": "Gets its virus counters by trashing cards it accesses and pays for strength with cards from the grip.",
       "abilities": [
         {
           "break": 2,
@@ -419,10 +420,10 @@
     },
     "living_mural": {
       "reviewed": true,
-      "note": "Installed on a piece of ice; breaks only sentries protecting that server.",
       "breaks": [
         "sentry"
       ],
+      "special": "Installed on a piece of ice; breaks only sentries protecting that server.",
       "abilities": [
         {
           "break": 1,
@@ -568,6 +569,7 @@
       "breaks": [
         "any"
       ],
+      "special": "Trashed when the run ends: a one-run breaker.",
       "abilities": [
         {
           "break": 1,
@@ -927,10 +929,10 @@
     },
     "slap_vandal": {
       "reviewed": true,
-      "note": "Installed on a piece of ice; breaks only that ice, 1 subroutine per encounter.",
       "breaks": [
         "any"
       ],
+      "special": "Installed on a piece of ice; breaks only that ice, 1 subroutine per encounter.",
       "abilities": [
         {
           "break": 1,
@@ -970,10 +972,10 @@
     },
     "tunnel_vision": {
       "reviewed": true,
-      "note": "Breaks only ice protecting your mark.",
       "breaks": [
         "any"
       ],
+      "special": "Breaks only ice protecting your mark.",
       "abilities": [
         {
           "break": 2,
@@ -991,6 +993,7 @@
       "breaks": [
         "code_gate"
       ],
+      "special": "Interfaces only with ice hosting a trojan program.",
       "abilities": [
         {
           "break": 3,

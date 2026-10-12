@@ -151,6 +151,9 @@ class _Entry(_Model):
 class BreakerEntry(_Entry):
     breaks: Breaks = []
     stealth: bool = False
+    # Why it only works in narrow situations (one host ice, a mark, a one-run program); the page
+    # can leave such breakers out.
+    special: str | None = Field(None, min_length=1, max_length=200)
     strength: Amount | None = None
     abilities: list[Ability] = []
     variants: list[Variant] = []

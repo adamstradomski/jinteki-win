@@ -77,6 +77,7 @@ Amounts and `spend` name params by id (`a-z`, `0-9`, `_`); a name that isn't in 
 |---|---|
 | `breaks` | Ice subtypes it interfaces with: `barrier`, `code_gate`, `sentry`, or `any` for AI |
 | `stealth` | Its abilities spend credits only from stealth cards (a filter on the page) |
+| `special` | Why it only works in narrow situations (Slap Vandal: one host ice; Mayfly: one run); the page has a switch that leaves these out |
 | `params` | Its settings |
 | `strength` | An amount added to the printed strength (Echelon: one per installed icebreaker) |
 | `abilities` | Its paid abilities, below |
