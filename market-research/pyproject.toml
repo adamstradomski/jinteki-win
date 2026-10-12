@@ -47,7 +47,7 @@ package-dir = { "" = "pipeline" }
 where = ["pipeline"]
 
 [tool.setuptools.package-data]
-market_research = ["data/*.json", "schemas/*.json"]
+market_research = ["data/*.json", "data/breaker_bay/*.json", "schemas/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

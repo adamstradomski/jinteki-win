@@ -1,0 +1,359 @@
+{
+  "schema": "bb.ice/1",
+  "cards": {
+    "afshar": {
+      "reviewed": true,
+      "note": "While it protects HQ, the Runner can break only 1 of its printed subroutines."
+    },
+    "akhet": {
+      "reviewed": true,
+      "params": {
+        "advancements": {
+          "label": "Hosted advancement counters",
+          "default": 0,
+          "max": 6
+        }
+      },
+      "strength": {
+        "steps": [
+          {
+            "param": "advancements",
+            "at": 3,
+            "add": 3
+          }
+        ]
+      }
+    },
+    "anvil": {
+      "reviewed": true,
+      "note": "The Corp can trash another installed card to stop its printed subroutines being broken."
+    },
+    "bathynomus": {
+      "reviewed": true,
+      "params": {
+        "archives": {
+          "label": "Protecting Archives",
+          "default": 0,
+          "max": 1,
+          "kind": "flag"
+        }
+      },
+      "strength": {
+        "per": {
+          "archives": 3
+        }
+      }
+    },
+    "boto": {
+      "reviewed": true,
+      "params": {
+        "threat": {
+          "label": "Threat level 4 or more",
+          "default": 0,
+          "max": 1,
+          "kind": "flag"
+        }
+      },
+      "strength": {
+        "per": {
+          "threat": 2
+        }
+      }
+    },
+    "capacitor": {
+      "reviewed": true,
+      "params": {
+        "tagged": {
+          "label": "Runner is tagged",
+          "default": 0,
+          "max": 1,
+          "kind": "flag"
+        }
+      },
+      "strength": {
+        "per": {
+          "tagged": 2
+        }
+      }
+    },
+    "colossus": {
+      "reviewed": true,
+      "params": {
+        "advancements": {
+          "label": "Hosted advancement counters",
+          "default": 0,
+          "max": 6
+        }
+      },
+      "strength": {
+        "per": {
+          "advancements": 1
+        }
+      }
+    },
+    "congratulations": {
+      "reviewed": true
+    },
+    "echo": {
+      "reviewed": true,
+      "params": {
+        "power": {
+          "label": "Hosted power counters",
+          "default": 1,
+          "max": 6
+        }
+      },
+      "note": "Has one End the run subroutine for each hosted power counter.",
+      "subs": {
+        "per": {
+          "power": 1
+        }
+      }
+    },
+    "envelopment": {
+      "reviewed": true,
+      "params": {
+        "power": {
+          "label": "Hosted power counters",
+          "default": 4,
+          "max": 4
+        }
+      },
+      "note": "Has an End the run subroutine for each hosted power counter; it starts with 4.",
+      "subs": {
+        "per": {
+          "power": 1
+        }
+      }
+    },
+    "ezam": {
+      "reviewed": true,
+      "note": "Its second subroutine gives every piece of ice +1 strength for the rest of the run."
+    },
+    "flywheel": {
+      "reviewed": true
+    },
+    "hafrun": {
+      "reviewed": true,
+      "note": "On rez it can stop one installed Runner card from breaking subroutines for the run."
+    },
+    "hagen": {
+      "reviewed": true,
+      "params": {
+        "icebreakers": {
+          "label": "Installed icebreakers",
+          "default": 3,
+          "max": 8
+        }
+      },
+      "strength": {
+        "per": {
+          "icebreakers": -1
+        }
+      }
+    },
+    "hammer": {
+      "reviewed": true,
+      "note": "The Runner can break only 1 of its printed subroutines except with killers."
+    },
+    "klevetnik": {
+      "reviewed": true
+    },
+    "knowledge_seeker": {
+      "reviewed": true
+    },
+    "konjin": {
+      "reviewed": true,
+      "note": "Has no subroutines: a Psi game can make the Runner encounter another piece of ice."
+    },
+    "logjam": {
+      "reviewed": true,
+      "params": {
+        "advancements": {
+          "label": "Hosted advancement counters",
+          "default": 1,
+          "max": 8
+        }
+      },
+      "note": "Rezzing it places 1 advancement counter plus 1 for each card type face up in Archives.",
+      "strength": {
+        "per": {
+          "advancements": 1
+        }
+      }
+    },
+    "lycian_multi_munition": {
+      "reviewed": true,
+      "note": "The Corp picks its subtypes on rez; counted here with all three.",
+      "gains": [
+        "barrier",
+        "code_gate",
+        "sentry"
+      ]
+    },
+    "maskirovka": {
+      "reviewed": true
+    },
+    "mestnichestvo": {
+      "reviewed": true
+    },
+    "palisade": {
+      "reviewed": true,
+      "params": {
+        "remote": {
+          "label": "Protecting a remote server",
+          "default": 1,
+          "max": 1,
+          "kind": "flag"
+        }
+      },
+      "strength": {
+        "per": {
+          "remote": 2
+        }
+      }
+    },
+    "pharos": {
+      "reviewed": true,
+      "params": {
+        "advancements": {
+          "label": "Hosted advancement counters",
+          "default": 0,
+          "max": 6
+        }
+      },
+      "strength": {
+        "steps": [
+          {
+            "param": "advancements",
+            "at": 3,
+            "add": 5
+          }
+        ]
+      }
+    },
+    "rime": {
+      "reviewed": true,
+      "note": "Gives each piece of ice protecting its server +1 strength (a support card)."
+    },
+    "sandstone": {
+      "reviewed": true,
+      "params": {
+        "virus": {
+          "label": "Hosted virus counters",
+          "default": 1,
+          "max": 6
+        }
+      },
+      "note": "Gets a virus counter each time the Runner encounters it, before the subroutines.",
+      "strength": {
+        "per": {
+          "virus": -1
+        }
+      }
+    },
+    "scatter_field": {
+      "reviewed": true,
+      "params": {
+        "alone": {
+          "label": "Only ice protecting its server",
+          "default": 0,
+          "max": 1,
+          "kind": "flag"
+        }
+      },
+      "strength": {
+        "per": {
+          "alone": 4
+        }
+      }
+    },
+    "semak_samun": {
+      "reviewed": true,
+      "broken_only_by": [
+        "fracter"
+      ]
+    },
+    "starlit_knight": {
+      "reviewed": true,
+      "params": {
+        "tags": {
+          "label": "Runner's tags (at threat level 4 or more)",
+          "default": 0,
+          "max": 6
+        }
+      },
+      "subs": {
+        "per": {
+          "tags": 1
+        }
+      }
+    },
+    "stavka": {
+      "reviewed": true,
+      "params": {
+        "trashed": {
+          "label": "The Corp trashed a card when rezzing it",
+          "default": 0,
+          "max": 1,
+          "kind": "flag"
+        }
+      },
+      "strength": {
+        "per": {
+          "trashed": 5
+        }
+      }
+    },
+    "syailendra": {
+      "reviewed": true
+    },
+    "tatu_bola": {
+      "reviewed": true
+    },
+    "tree_line": {
+      "reviewed": true,
+      "params": {
+        "advancements": {
+          "label": "Hosted advancement counters",
+          "default": 0,
+          "max": 6
+        }
+      },
+      "strength": {
+        "per": {
+          "advancements": 1
+        }
+      }
+    },
+    "tyr": {
+      "reviewed": true
+    },
+    "unsmiling_tsarevna": {
+      "reviewed": true,
+      "note": "If the Corp lets the Runner gain 2[credit] on rez, only 1 printed subroutine can be broken."
+    },
+    "valentao": {
+      "reviewed": true
+    },
+    "vampyronassa": {
+      "reviewed": true
+    },
+    "winchester": {
+      "reviewed": true,
+      "params": {
+        "hq": {
+          "label": "Protecting HQ",
+          "default": 0,
+          "max": 1,
+          "kind": "flag"
+        }
+      },
+      "subs": {
+        "per": {
+          "hq": 1
+        }
+      }
+    }
+  }
+}

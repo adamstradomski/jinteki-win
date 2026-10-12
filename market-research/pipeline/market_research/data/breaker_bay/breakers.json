@@ -1,0 +1,1073 @@
+{
+  "schema": "bb.breakers/1",
+  "cards": {
+    "abaasy": {
+      "reviewed": true,
+      "breaks": [
+        "code_gate"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 2,
+          "cost": 2
+        }
+      ]
+    },
+    "afterimage": {
+      "reviewed": true,
+      "note": "Spends credits only from stealth cards.",
+      "breaks": [
+        "sentry"
+      ],
+      "stealth": true,
+      "abilities": [
+        {
+          "break": 2,
+          "cost": 1
+        },
+        {
+          "pump": 2,
+          "cost": 1
+        }
+      ],
+      "variants": [
+        {
+          "id": "break",
+          "label": "Breaking",
+          "default": true
+        },
+        {
+          "id": "bypass",
+          "label": "Bypassing (once per turn)",
+          "abilities": [
+            {
+              "bypass": true,
+              "cost": 2,
+              "only": [
+                "sentry"
+              ],
+              "once": "turn"
+            },
+            {
+              "break": 2,
+              "cost": 1
+            },
+            {
+              "pump": 2,
+              "cost": 1
+            }
+          ]
+        }
+      ]
+    },
+    "audrey_v2": {
+      "reviewed": true,
+      "params": {
+        "virus": {
+          "label": "Hosted virus counters",
+          "default": 0,
+          "max": 10
+        },
+        "grip": {
+          "label": "Cards in the grip to trash",
+          "default": 5,
+          "max": 10
+        }
+      },
+      "note": "Gets virus counters by trashing cards you access; it starts with none.",
+      "breaks": [
+        "any"
+      ],
+      "abilities": [
+        {
+          "break": 2,
+          "spend": {
+            "param": "virus"
+          }
+        },
+        {
+          "pump": 3,
+          "spend": {
+            "param": "grip"
+          }
+        }
+      ]
+    },
+    "banner": {
+      "reviewed": true,
+      "unmodelled": "Doesn't break subroutines: 2[credit] stops the barrier's subroutines from ending the run."
+    },
+    "begemot": {
+      "reviewed": true,
+      "params": {
+        "core_damage": {
+          "label": "Core damage taken this game",
+          "default": 1,
+          "max": 6
+        }
+      },
+      "note": "Installing it deals 1 core damage. No way to raise its strength with credits.",
+      "breaks": [
+        "barrier"
+      ],
+      "strength": {
+        "per": {
+          "core_damage": 1
+        }
+      },
+      "abilities": [
+        {
+          "break": "any",
+          "cost": 1
+        }
+      ]
+    },
+    "boi_tata": {
+      "reviewed": true,
+      "breaks": [
+        "sentry"
+      ],
+      "abilities": [
+        {
+          "break": 2,
+          "cost": 2
+        },
+        {
+          "pump": 3,
+          "cost": 3
+        }
+      ],
+      "variants": [
+        {
+          "id": "normal",
+          "label": "Without trashing a card this turn",
+          "default": true
+        },
+        {
+          "id": "trashed",
+          "label": "After trashing an installed card this turn",
+          "abilities": [
+            {
+              "break": 2,
+              "cost": 1
+            },
+            {
+              "pump": 3,
+              "cost": 2
+            }
+          ]
+        }
+      ]
+    },
+    "buzzsaw": {
+      "reviewed": true,
+      "breaks": [
+        "code_gate"
+      ],
+      "abilities": [
+        {
+          "break": 2,
+          "cost": 1
+        },
+        {
+          "pump": 1,
+          "cost": 3
+        }
+      ]
+    },
+    "carmen": {
+      "reviewed": true,
+      "note": "Costs 2[credit] less to install after a successful run this turn.",
+      "breaks": [
+        "sentry"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 3,
+          "cost": 2
+        }
+      ]
+    },
+    "cats_cradle": {
+      "reviewed": true,
+      "note": "Also makes code gates cost 1[credit] more to rez.",
+      "breaks": [
+        "code_gate"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 1,
+          "cost": 1
+        }
+      ]
+    },
+    "corsair": {
+      "reviewed": true,
+      "note": "Lowers the barrier's strength by 3 instead of raising its own. Spends credits only from stealth cards.",
+      "breaks": [
+        "barrier"
+      ],
+      "stealth": true,
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "weaken": 3,
+          "cost": 1
+        }
+      ]
+    },
+    "curupira": {
+      "reviewed": true,
+      "params": {
+        "power": {
+          "label": "Hosted power counters",
+          "default": 0,
+          "max": 6
+        }
+      },
+      "note": "Gets 1 power counter each time it fully breaks a piece of ice; 3 of them bypass a barrier.",
+      "breaks": [
+        "barrier"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 1,
+          "cost": 1
+        },
+        {
+          "bypass": true,
+          "spend": {
+            "param": "power",
+            "n": 3
+          },
+          "only": [
+            "barrier"
+          ]
+        }
+      ]
+    },
+    "echelon": {
+      "reviewed": true,
+      "params": {
+        "icebreakers": {
+          "label": "Installed icebreakers (including this one)",
+          "default": 3,
+          "min": 1,
+          "max": 8
+        }
+      },
+      "breaks": [
+        "sentry"
+      ],
+      "strength": {
+        "per": {
+          "icebreakers": 1
+        }
+      },
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 2,
+          "cost": 3
+        }
+      ]
+    },
+    "euler": {
+      "reviewed": true,
+      "breaks": [
+        "code_gate"
+      ],
+      "abilities": [
+        {
+          "break": 2,
+          "cost": 2
+        },
+        {
+          "pump": 1,
+          "cost": 1
+        }
+      ],
+      "variants": [
+        {
+          "id": "later",
+          "label": "After its install turn",
+          "default": true
+        },
+        {
+          "id": "install_turn",
+          "label": "On its install turn",
+          "abilities": [
+            {
+              "break": 1
+            },
+            {
+              "break": 2,
+              "cost": 2
+            },
+            {
+              "pump": 1,
+              "cost": 1
+            }
+          ]
+        }
+      ]
+    },
+    "gauss": {
+      "reviewed": true,
+      "breaks": [
+        "barrier"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 2,
+          "cost": 2
+        }
+      ],
+      "variants": [
+        {
+          "id": "later",
+          "label": "After its install turn",
+          "default": true
+        },
+        {
+          "id": "install_turn",
+          "label": "On its install turn (+3 strength)",
+          "strength": 3
+        }
+      ]
+    },
+    "hantu": {
+      "reviewed": true,
+      "params": {
+        "virus": {
+          "label": "Hosted virus counters",
+          "default": 2,
+          "max": 6
+        }
+      },
+      "note": "Its only way to gain strength is a hosted virus counter.",
+      "breaks": [
+        "sentry"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 2,
+          "spend": {
+            "param": "virus"
+          }
+        }
+      ]
+    },
+    "hyperbaric": {
+      "reviewed": true,
+      "params": {
+        "power": {
+          "label": "Hosted power counters",
+          "default": 1,
+          "max": 8
+        }
+      },
+      "note": "2[credit] places a power counter, so the strength it buys stays.",
+      "breaks": [
+        "code_gate"
+      ],
+      "strength": {
+        "per": {
+          "power": 1
+        }
+      },
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 1,
+          "cost": 2
+        }
+      ]
+    },
+    "living_mural": {
+      "reviewed": true,
+      "note": "Installed on a piece of ice; breaks only sentries protecting that server.",
+      "breaks": [
+        "sentry"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 2,
+          "cost": 1
+        }
+      ],
+      "variants": [
+        {
+          "id": "normal",
+          "label": "Normal",
+          "default": true
+        },
+        {
+          "id": "threat",
+          "label": "Install turn at threat level 4 (+3 strength)",
+          "strength": 3
+        }
+      ]
+    },
+    "lobisomem": {
+      "reviewed": true,
+      "params": {
+        "power": {
+          "label": "Hosted power counters",
+          "default": 1,
+          "max": 6
+        }
+      },
+      "note": "Gets a power counter on install and whenever it fully breaks a code gate.",
+      "breaks": [
+        "barrier",
+        "code_gate"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1,
+          "only": [
+            "code_gate"
+          ]
+        },
+        {
+          "break": "X",
+          "cost": "X",
+          "spend": {
+            "param": "power"
+          },
+          "only": [
+            "barrier"
+          ]
+        },
+        {
+          "pump": 2,
+          "cost": 1
+        }
+      ]
+    },
+    "makler": {
+      "reviewed": true,
+      "breaks": [
+        "barrier"
+      ],
+      "abilities": [
+        {
+          "break": 2,
+          "cost": 2
+        },
+        {
+          "pump": 2,
+          "cost": 2
+        }
+      ],
+      "variants": [
+        {
+          "id": "first",
+          "label": "First ice it fully breaks this turn",
+          "default": true,
+          "abilities": [
+            {
+              "break": 2,
+              "cost": 2
+            },
+            {
+              "pump": 2,
+              "cost": 2
+            },
+            {
+              "rebate": 1,
+              "once": "turn"
+            }
+          ]
+        },
+        {
+          "id": "later",
+          "label": "Later ice this turn"
+        }
+      ]
+    },
+    "marjanah": {
+      "reviewed": true,
+      "breaks": [
+        "barrier"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 2
+        },
+        {
+          "pump": 1,
+          "cost": 1
+        }
+      ],
+      "variants": [
+        {
+          "id": "no_run",
+          "label": "Without a successful run this turn",
+          "default": true
+        },
+        {
+          "id": "after_run",
+          "label": "After a successful run this turn",
+          "abilities": [
+            {
+              "break": 1,
+              "cost": 1
+            },
+            {
+              "pump": 1,
+              "cost": 1
+            }
+          ]
+        }
+      ]
+    },
+    "mayfly": {
+      "reviewed": true,
+      "note": "Trashed when the run ends.",
+      "breaks": [
+        "any"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 1,
+          "cost": 1
+        }
+      ]
+    },
+    "nanuq": {
+      "reviewed": true,
+      "note": "Removed from the game when an agenda is scored or stolen.",
+      "breaks": [
+        "any"
+      ],
+      "abilities": [
+        {
+          "break": 2,
+          "cost": 2
+        },
+        {
+          "pump": 1,
+          "cost": 1
+        }
+      ]
+    },
+    "num": {
+      "reviewed": true,
+      "note": "No way to raise its strength.",
+      "breaks": [
+        "sentry"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 2
+        }
+      ]
+    },
+    "odore": {
+      "reviewed": true,
+      "breaks": [
+        "sentry"
+      ],
+      "abilities": [
+        {
+          "break": "any",
+          "cost": 2
+        },
+        {
+          "pump": 3,
+          "cost": 3
+        }
+      ],
+      "variants": [
+        {
+          "id": "normal",
+          "label": "Fewer than 3 virtual resources",
+          "default": true
+        },
+        {
+          "id": "virtual",
+          "label": "3 or more virtual resources",
+          "abilities": [
+            {
+              "break": "any",
+              "cost": 2
+            },
+            {
+              "break": 1
+            },
+            {
+              "pump": 3,
+              "cost": 3
+            }
+          ]
+        }
+      ]
+    },
+    "orca": {
+      "reviewed": true,
+      "breaks": [
+        "sentry"
+      ],
+      "abilities": [
+        {
+          "break": "any",
+          "cost": 2
+        },
+        {
+          "pump": 3,
+          "cost": 2
+        }
+      ]
+    },
+    "penrose": {
+      "reviewed": true,
+      "note": "Its strength ability spends credits only from stealth cards.",
+      "breaks": [
+        "code_gate"
+      ],
+      "stealth": true,
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1,
+          "only": [
+            "code_gate"
+          ]
+        },
+        {
+          "pump": 3,
+          "cost": 1
+        }
+      ],
+      "variants": [
+        {
+          "id": "later",
+          "label": "After its install turn",
+          "default": true
+        },
+        {
+          "id": "install_turn",
+          "label": "On its install turn (also breaks barriers)",
+          "breaks": [
+            "barrier",
+            "code_gate"
+          ],
+          "abilities": [
+            {
+              "break": 1,
+              "cost": 1,
+              "only": [
+                "barrier"
+              ]
+            },
+            {
+              "break": 1,
+              "cost": 1,
+              "only": [
+                "code_gate"
+              ]
+            },
+            {
+              "pump": 3,
+              "cost": 1
+            }
+          ]
+        }
+      ]
+    },
+    "pressure_spike": {
+      "reviewed": true,
+      "breaks": [
+        "barrier"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 3,
+          "cost": 2
+        }
+      ],
+      "variants": [
+        {
+          "id": "normal",
+          "label": "Threat level below 4",
+          "default": true
+        },
+        {
+          "id": "threat",
+          "label": "Threat level 4 or more",
+          "abilities": [
+            {
+              "break": 1,
+              "cost": 1
+            },
+            {
+              "pump": 3,
+              "cost": 2
+            },
+            {
+              "pump": 9,
+              "cost": 2,
+              "once": "run"
+            }
+          ]
+        }
+      ]
+    },
+    "principia": {
+      "reviewed": true,
+      "note": "Costs 1[credit] less to install for each other installed icebreaker.",
+      "breaks": [
+        "barrier"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 2,
+          "cost": 2
+        }
+      ]
+    },
+    "propeller": {
+      "reviewed": true,
+      "params": {
+        "power": {
+          "label": "Hosted power counters",
+          "default": 4,
+          "max": 4
+        }
+      },
+      "note": "Its only way to gain strength is a hosted power counter.",
+      "breaks": [
+        "barrier"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 2,
+          "spend": {
+            "param": "power"
+          }
+        }
+      ]
+    },
+    "revolver": {
+      "reviewed": true,
+      "params": {
+        "power": {
+          "label": "Hosted power counters",
+          "default": 6,
+          "max": 6
+        }
+      },
+      "note": "Can also break 1 subroutine by trashing itself.",
+      "breaks": [
+        "sentry"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "spend": {
+            "param": "power"
+          }
+        },
+        {
+          "pump": 3,
+          "cost": 2
+        }
+      ]
+    },
+    "rising_tide": {
+      "reviewed": true,
+      "params": {
+        "fracters_in_heap": {
+          "label": "Fracters in the heap",
+          "default": 0,
+          "max": 6
+        }
+      },
+      "breaks": [
+        "barrier"
+      ],
+      "strength": {
+        "per": {
+          "fracters_in_heap": 1
+        }
+      },
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 1,
+          "cost": 1
+        }
+      ]
+    },
+    "sang_kancil": {
+      "reviewed": true,
+      "breaks": [
+        "code_gate"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 2,
+          "cost": 3
+        }
+      ],
+      "variants": [
+        {
+          "id": "normal",
+          "label": "No run event active",
+          "default": true
+        },
+        {
+          "id": "run_event",
+          "label": "During a run event",
+          "abilities": [
+            {
+              "break": 1,
+              "cost": 1
+            },
+            {
+              "pump": 2,
+              "cost": 1
+            }
+          ]
+        }
+      ]
+    },
+    "shibboleth": {
+      "reviewed": true,
+      "breaks": [
+        "code_gate"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": 2,
+          "cost": 2
+        }
+      ],
+      "variants": [
+        {
+          "id": "normal",
+          "label": "Threat level below 4",
+          "default": true
+        },
+        {
+          "id": "threat",
+          "label": "Threat level 4 or more (−2 strength)",
+          "strength": -2
+        }
+      ]
+    },
+    "slap_vandal": {
+      "reviewed": true,
+      "note": "Installed on a piece of ice; breaks only that ice, 1 subroutine per encounter.",
+      "breaks": [
+        "any"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1,
+          "once": "encounter"
+        }
+      ]
+    },
+    "tremolo": {
+      "reviewed": true,
+      "params": {
+        "cybernetic": {
+          "label": "Installed cybernetic hardware",
+          "default": 0,
+          "max": 4
+        }
+      },
+      "breaks": [
+        "barrier"
+      ],
+      "abilities": [
+        {
+          "break": 2,
+          "cost": {
+            "base": 3,
+            "per": {
+              "cybernetic": -1
+            },
+            "min": 0
+          }
+        },
+        {
+          "pump": 2,
+          "cost": 2
+        }
+      ]
+    },
+    "tunnel_vision": {
+      "reviewed": true,
+      "note": "Breaks only ice protecting your mark.",
+      "breaks": [
+        "any"
+      ],
+      "abilities": [
+        {
+          "break": 2,
+          "cost": 2
+        },
+        {
+          "pump": 2,
+          "cost": 2
+        }
+      ]
+    },
+    "umbrella": {
+      "reviewed": true,
+      "note": "Interfaces only with ice hosting a trojan program. No way to raise its strength.",
+      "breaks": [
+        "code_gate"
+      ],
+      "abilities": [
+        {
+          "break": 3,
+          "cost": 2
+        }
+      ]
+    },
+    "unity": {
+      "reviewed": true,
+      "params": {
+        "icebreakers": {
+          "label": "Installed icebreakers (including this one)",
+          "default": 3,
+          "min": 1,
+          "max": 8
+        }
+      },
+      "breaks": [
+        "code_gate"
+      ],
+      "abilities": [
+        {
+          "break": 1,
+          "cost": 1
+        },
+        {
+          "pump": {
+            "per": {
+              "icebreakers": 1
+            }
+          },
+          "cost": 1
+        }
+      ]
+    },
+    "utae": {
+      "reviewed": true,
+      "breaks": [
+        "code_gate"
+      ],
+      "abilities": [
+        {
+          "break": "X",
+          "cost": "X",
+          "once": "run"
+        },
+        {
+          "pump": 1,
+          "cost": 1
+        }
+      ],
+      "variants": [
+        {
+          "id": "normal",
+          "label": "Fewer than 3 virtual resources",
+          "default": true
+        },
+        {
+          "id": "virtual",
+          "label": "3 or more virtual resources",
+          "abilities": [
+            {
+              "break": "X",
+              "cost": "X",
+              "once": "run"
+            },
+            {
+              "break": 1,
+              "cost": 1
+            },
+            {
+              "pump": 1,
+              "cost": 1
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -72,7 +72,8 @@
     "trends_cut": "meta/{side}/{restriction}/{tier_group}/cut/trends.json",
     "tournaments": "meta/{restriction}/{tier_group}/tournaments.json",
     "identities": "meta/{side}/{restriction}/{tier_group}/identities.json",
-    "quality": "quality/report.json"
+    "quality": "quality/report.json",
+    "breaker_bay": "breaker-bay/pool.json"
   },
   "schemas": {
     "manifest": "mr.manifest/1",
@@ -80,7 +81,8 @@
     "trends": "mr.trends/1",
     "identities": "mr.identities/1",
     "catalog": "mr.catalog/1",
-    "quality": "mr.quality/1"
+    "quality": "mr.quality/1",
+    "breaker_bay": "mr.breaker_bay/1"
   },
   "attribution": {
     "text": "Tournament results from AlwaysBeRunning.net and NSG Cobra; decklists from NetrunnerDB and NSG Cobra; card data from NetrunnerDB.",

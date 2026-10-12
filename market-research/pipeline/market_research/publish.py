@@ -12,12 +12,13 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from functools import cache
 from importlib import resources
+from pathlib import Path
 from typing import Any
 
 import duckdb
 import jsonschema
 
-from market_research import logs
+from market_research import breaker_bay, logs
 from market_research.catalog import Catalog
 from market_research.config import SIDES, Settings, tier_config
 from market_research.metrics import (
@@ -49,6 +50,7 @@ SCHEMAS = {
     "catalog": "mr.catalog/1",
     "quality": "mr.quality/1",
     "tournaments": "mr.tournaments/1",
+    "breaker_bay": "mr.breaker_bay/1",
 }
 PATHS = {
     "catalog": "catalog/cards.json",
@@ -61,6 +63,8 @@ PATHS = {
     "tournaments": "meta/{restriction}/{tier_group}/tournaments.json",
     "identities": "meta/{side}/{restriction}/{tier_group}/identities.json",
     "quality": "quality/report.json",
+    # Breaker Bay: the current Standard breakers and ice with the curated cost model.
+    "breaker_bay": "breaker-bay/pool.json",
 }
 ATTRIBUTION = {
     "text": "Tournament results from AlwaysBeRunning.net and NSG Cobra; decklists from NetrunnerDB and NSG Cobra; card data from NetrunnerDB.",
@@ -541,6 +545,17 @@ class SnapshotBuilder:
             "cards": cards,
         }
 
+    def breaker_bay_file(self, curated: breaker_bay.Curated) -> dict[str, Any]:
+        """The pool of the Standard ban list in force at the run, not the newest one with tournaments."""
+        snap = self.catalog.snapshot_at(self.now.date().isoformat())
+        rid = snap.restriction_id if snap else None
+        pool = breaker_bay.current_pool(self.catalog, rid)
+        out = breaker_bay.slice_file(pool, curated, self.version, SCHEMAS["breaker_bay"])
+        missing = [b["id"] for b in out["breakers"] if b.get("unmodelled") == breaker_bay.NOT_REVIEWED]
+        if missing:
+            log.warning("breaker_bay_missing_entries", cards=missing)
+        return out
+
     def restriction_list(self) -> list[dict[str, Any]]:
         out: list[dict[str, Any]] = [{"id": "all", "name": "All ban lists", "date_start": None}]
         for r in self.restrictions:
@@ -550,8 +565,9 @@ class SnapshotBuilder:
             )
         return out
 
-    def build(self, quality: dict[str, Any]) -> Snapshot:
+    def build(self, quality: dict[str, Any], curated: breaker_bay.Curated | None = None) -> Snapshot:
         files: dict[str, Any] = {PATHS["catalog"]: self.catalog_file()}
+        files[PATHS["breaker_bay"]] = self.breaker_bay_file(curated or breaker_bay.Curated())
         for side in SIDES:
             for restriction in ["all", *self.restrictions]:
                 for group in ["all", *self.groups]:
@@ -647,6 +663,7 @@ def validate(snap: Snapshot, con: duckdb.DuckDBPyConnection) -> list[str]:
         "identities": "identities",
         "report": "quality",
         "tournaments": "tournaments",
+        "pool": "breaker_bay",
     }
     known = {c["id"] for c in snap.files[PATHS["catalog"]]["cards"]}
     for path, obj in sorted(snap.files.items()):
@@ -666,7 +683,8 @@ def validate(snap: Snapshot, con: duckdb.DuckDBPyConnection) -> list[str]:
             ids = {c["card_id"] for c in obj["identities"]}
         elif kind == "trends":
             ids = set(obj["cards"])
-        elif kind == "tournaments":
+        elif kind in ("tournaments", "breaker_bay"):
+            # Breaker Bay lists the ban list in force, which may have no tournaments in the catalog file yet.
             ids = set()
         missing = ids - known
         if missing:
@@ -720,21 +738,37 @@ def validate(snap: Snapshot, con: duckdb.DuckDBPyConnection) -> list[str]:
     return errors
 
 
-def build(stores: Stores, settings: Settings, now: datetime) -> tuple[Snapshot, list[str]]:
+def load_curated(directory: Path | None = None) -> tuple[breaker_bay.Curated, list[str]]:
+    """The Breaker Bay files, and the errors that stop publishing: a file that breaks the format, or
+    an entry not reviewed yet (a draft must never reach the site)."""
+    try:
+        cur = breaker_bay.load(directory)
+    except breaker_bay.CuratedError as e:
+        return breaker_bay.Curated(), [f"breaker-bay: {e}"]
+    pending = cur.unreviewed()
+    return cur, [f"breaker-bay: not reviewed: {', '.join(pending)}"] if pending else []
+
+
+def stored_catalog(stores: Stores, settings: Settings) -> Catalog:
     sources_catalog = {
         k: v
         for k, v in load_sources(stores.source, stores.canonical).items()
         if k.startswith("nrdb/catalog/")
     }
-    catalog = Normalizer(sources_catalog, settings).catalog
+    return Normalizer(sources_catalog, settings).catalog
+
+
+def build(stores: Stores, settings: Settings, now: datetime) -> tuple[Snapshot, list[str]]:
+    catalog = stored_catalog(stores, settings)
     with tempfile.TemporaryDirectory() as tmp:
         con = duckdb.connect()
         try:
             load_tables(stores.canonical, con, tmp)
             norm_q = stores.canonical.get_json(NORMALIZE_QUALITY_KEY) or {}
             builder = SnapshotBuilder(con, catalog, settings, now, free_version(stores, now))
-            snap = builder.build(quality_report(stores, con, norm_q, settings))
-            errors = validate(snap, con)
+            curated, curated_errors = load_curated()
+            snap = builder.build(quality_report(stores, con, norm_q, settings), curated)
+            errors = curated_errors + validate(snap, con)
         finally:
             con.close()
     return snap, errors

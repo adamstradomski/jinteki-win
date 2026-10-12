@@ -45,7 +45,7 @@ def test_run_all_reproduces_golden_snapshot(tmp_path, clock, served):
     env = make_env(tmp_path, clock)
     res = run_all(runtime(env))
     assert res.exit_code == EXIT_OK
-    assert res.slices_published == 167
+    assert res.slices_published == 168
     got = published_tree(env)
     if UPDATE:
         shutil.rmtree(GOLDEN, ignore_errors=True)
@@ -78,7 +78,7 @@ def test_cli_run_all_dry_run_with_fixtures(tmp_path, monkeypatch):
     assert result.exit_code == 0, result.output
     lines = [json.loads(line) for line in result.output.splitlines() if line.startswith("{")]
     summary = next(x for x in lines if x["event"] == "run_summary")
-    assert summary["slices_published"] == 167 and summary["exit_code"] == 0
+    assert summary["slices_published"] == 168 and summary["exit_code"] == 0
     assert set(summary["requests"]) == {"abr", "cobra", "nrdb"}
     path = next(x for x in lines if x["event"] == "dry_run_store")["path"]
     assert os.path.exists(os.path.join(path, "mr-published", "manifest.json"))

@@ -39,6 +39,8 @@ app = typer.Typer(
 )
 fixtures_app = typer.Typer(help="Fixture maintenance (manual only; never run in CI).")
 app.add_typer(fixtures_app, name="fixtures")
+breaker_bay_app = typer.Typer(help="Breaker Bay's hand-curated cost data.")
+app.add_typer(breaker_bay_app, name="breaker-bay")
 log = logs.get("market_research.cli")
 
 
@@ -255,6 +257,52 @@ def fixtures_refresh(
     rt = _runtime(True)
     written = refresh(rt, out, cobra=cobra, abr=abr)
     typer.echo(f"wrote {len(written)} files to {out}; review them before committing")
+
+
+@breaker_bay_app.command("draft")
+def breaker_bay_draft(
+    prune: Annotated[
+        bool, typer.Option("--prune", help="Also remove entries for cards no longer in the pool.")
+    ] = False,
+    directory: Annotated[
+        Path | None,
+        typer.Option("--dir", help="The curated files' directory (default: the package's data/breaker_bay)."),
+    ] = None,
+    now: Now = None,
+) -> None:
+    """Draft entries, marked not reviewed, for Standard breakers, ice and support cards the curated
+    files don't cover yet. Review each one, then set "reviewed": true."""
+    from market_research import breaker_bay
+    from market_research.publish import stored_catalog
+
+    rt = _runtime(False, None, now)
+    target = directory or breaker_bay.default_dir()
+    try:
+        cur = breaker_bay.load(target)
+    except breaker_bay.CuratedError as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(EXIT_FAILURE) from None
+    catalog = stored_catalog(rt.stores, rt.settings)
+    snap = catalog.snapshot_at(rt.clock.now().date().isoformat())
+    if not catalog.cards or snap is None or not snap.restriction_id:
+        typer.echo("No card catalog stored yet: run ingest first.", err=True)
+        raise typer.Exit(EXIT_FAILURE)
+    pool = breaker_bay.current_pool(catalog, snap.restriction_id)
+    entries, rep = breaker_bay.draft(pool, cur, prune=prune)
+    if rep.changed():
+        breaker_bay.write(target, entries)
+    typer.echo(f"pool: {snap.restriction_id} ({len(pool.breakers)} breakers, {len(pool.ice)} ice)")
+    for name in breaker_bay.FILES:
+        for label, ids in (
+            ("drafted", rep.added[name]),
+            ("pruned", rep.pruned[name]),
+            ("not in the pool (--prune removes)", rep.outside_pool[name]),
+        ):
+            if ids:
+                typer.echo(f"{name}.json {label}: {', '.join(ids)}")
+    pending = breaker_bay.Curated(**{n: entries[n] for n in breaker_bay.FILES}).unreviewed()
+    typer.echo(f"waiting for review: {len(pending)}" + (f" ({', '.join(pending)})" if pending else ""))
+    raise typer.Exit(EXIT_OK)
 
 
 def main() -> None:

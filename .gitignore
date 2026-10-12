@@ -8,6 +8,8 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 data/
+# ...but the pipeline's own packaged data (tier groups, Breaker Bay's curated files) is source.
+!market-research/pipeline/market_research/data/
 market-research.env
 # Saved run logs (e.g. docker logs mr-backfill > backfill.log); test/*.log game logs stay tracked
 /*.log

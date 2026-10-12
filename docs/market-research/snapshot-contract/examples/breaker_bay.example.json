@@ -1,0 +1,220 @@
+{
+  "schema": "mr.breaker_bay/1",
+  "version": "2026-09-27T040000Z",
+  "restriction": "standard_balance_update_26_08",
+  "breakers": [
+    {
+      "id": "banner",
+      "title": "Banner",
+      "faction": "anarch",
+      "cost": 4,
+      "mu": 1,
+      "strength": 5,
+      "subtypes": [
+        "fracter",
+        "icebreaker",
+        "weapon"
+      ],
+      "unmodelled": "Doesn't break subroutines: 2[credit] stops the barrier's subroutines from ending the run."
+    },
+    {
+      "id": "propeller",
+      "title": "Propeller",
+      "faction": "shaper",
+      "cost": 1,
+      "mu": 1,
+      "strength": 0,
+      "subtypes": [
+        "fracter",
+        "icebreaker"
+      ],
+      "model": {
+        "params": {
+          "power": {
+            "label": "Hosted power counters",
+            "default": 4,
+            "max": 4
+          }
+        },
+        "note": "Its only way to gain strength is a hosted power counter.",
+        "breaks": [
+          "barrier"
+        ],
+        "abilities": [
+          {
+            "break": 1,
+            "cost": 1
+          },
+          {
+            "pump": 2,
+            "spend": {
+              "param": "power"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "unity",
+      "title": "Unity",
+      "faction": "shaper",
+      "cost": 3,
+      "mu": 1,
+      "strength": 1,
+      "subtypes": [
+        "decoder",
+        "icebreaker"
+      ],
+      "model": {
+        "params": {
+          "icebreakers": {
+            "label": "Installed icebreakers (including this one)",
+            "default": 3,
+            "min": 1,
+            "max": 8
+          }
+        },
+        "breaks": [
+          "code_gate"
+        ],
+        "abilities": [
+          {
+            "break": 1,
+            "cost": 1
+          },
+          {
+            "pump": {
+              "per": {
+                "icebreakers": 1
+              }
+            },
+            "cost": 1
+          }
+        ]
+      }
+    }
+  ],
+  "ice": [
+    {
+      "id": "ablative_barrier",
+      "title": "Ablative Barrier",
+      "faction": "haas_bioroid",
+      "rez": 2,
+      "strength": 1,
+      "subtypes": [
+        "barrier"
+      ],
+      "types": [
+        "barrier"
+      ],
+      "subs": 1
+    },
+    {
+      "id": "echo",
+      "title": "Echo",
+      "faction": "haas_bioroid",
+      "rez": 2,
+      "strength": 0,
+      "subtypes": [
+        "barrier",
+        "harmonic"
+      ],
+      "types": [
+        "barrier"
+      ],
+      "subs": 0,
+      "model": {
+        "params": {
+          "power": {
+            "label": "Hosted power counters",
+            "default": 1,
+            "max": 6
+          }
+        },
+        "note": "Has one End the run subroutine for each hosted power counter.",
+        "subs": {
+          "per": {
+            "power": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "hagen",
+      "title": "Hagen",
+      "faction": "haas_bioroid",
+      "rez": 4,
+      "strength": 6,
+      "subtypes": [
+        "barrier",
+        "destroyer"
+      ],
+      "types": [
+        "barrier"
+      ],
+      "subs": 2,
+      "model": {
+        "params": {
+          "icebreakers": {
+            "label": "Installed icebreakers",
+            "default": 3,
+            "max": 8
+          }
+        },
+        "strength": {
+          "per": {
+            "icebreakers": -1
+          }
+        }
+      }
+    },
+    {
+      "id": "pharos",
+      "title": "Pharos",
+      "faction": "weyland_consortium",
+      "rez": 7,
+      "strength": 5,
+      "subtypes": [
+        "barrier"
+      ],
+      "types": [
+        "barrier"
+      ],
+      "subs": 3,
+      "model": {
+        "params": {
+          "advancements": {
+            "label": "Hosted advancement counters",
+            "default": 0,
+            "max": 6
+          }
+        },
+        "strength": {
+          "steps": [
+            {
+              "param": "advancements",
+              "at": 3,
+              "add": 5
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "support": [
+    {
+      "id": "the_tungsten_tailor",
+      "title": "The Tungsten Tailor",
+      "side": "runner",
+      "faction": "anarch",
+      "type": "hardware",
+      "model": {
+        "effects": [
+          {
+            "ice_strength": -1
+          }
+        ]
+      }
+    }
+  ]
+}

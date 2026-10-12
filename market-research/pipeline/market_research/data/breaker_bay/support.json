@@ -1,0 +1,191 @@
+{
+  "schema": "bb.support/1",
+  "cards": {
+    "arruaceiras_crew": {
+      "reviewed": true,
+      "note": "Once per turn, by taking 1 tag, for one encounter.",
+      "effects": [
+        {
+          "ice_strength": -2
+        }
+      ]
+    },
+    "brasilia_government_grid": {
+      "reviewed": true,
+      "note": "Ice rezzed during a run on its server, after derezzing another piece of ice.",
+      "effects": [
+        {
+          "ice_strength": 3
+        }
+      ]
+    },
+    "chisel": {
+      "reviewed": true,
+      "params": {
+        "virus": {
+          "label": "Hosted virus counters",
+          "default": 0,
+          "max": 6
+        }
+      },
+      "note": "Hosted on one piece of ice; gets a virus counter at each encounter.",
+      "effects": [
+        {
+          "ice_strength": {
+            "per": {
+              "virus": -1
+            }
+          }
+        }
+      ]
+    },
+    "chromatophores": {
+      "reviewed": true,
+      "note": "Hosted on one piece of ice.",
+      "effects": [
+        {
+          "ice_gains": [
+            "barrier",
+            "code_gate",
+            "sentry"
+          ]
+        }
+      ]
+    },
+    "cybertrooper_talut": {
+      "reviewed": true,
+      "note": "Only on the turn the icebreaker is installed.",
+      "effects": [
+        {
+          "breaker_strength": 2,
+          "breakers": "non_ai"
+        }
+      ]
+    },
+    "devil_charm": {
+      "reviewed": true,
+      "note": "Removed from the game when used; for one run.",
+      "effects": [
+        {
+          "ice_strength": -6
+        }
+      ]
+    },
+    "gamedragon_pro": {
+      "reviewed": true,
+      "note": "Hosted on one icebreaker.",
+      "effects": [
+        {
+          "breaker_strength": 1,
+          "breakers": "non_ai"
+        }
+      ]
+    },
+    "isaac_liberdade": {
+      "reviewed": true,
+      "note": "Advanced ice protecting its server.",
+      "effects": [
+        {
+          "ice_strength": 2
+        }
+      ]
+    },
+    "leech": {
+      "reviewed": true,
+      "params": {
+        "virus": {
+          "label": "Hosted virus counters",
+          "default": 0,
+          "max": 6
+        }
+      },
+      "note": "Gets a virus counter after each successful run on a central server.",
+      "effects": [
+        {
+          "ice_strength": {
+            "per": {
+              "virus": -1
+            }
+          }
+        }
+      ]
+    },
+    "monkeywrench": {
+      "reviewed": true,
+      "note": "Its host ice; the other ice of that server gets −1.",
+      "effects": [
+        {
+          "ice_strength": -2
+        }
+      ]
+    },
+    "next_activation_command": {
+      "reviewed": true,
+      "note": "Also stops non-icebreaker cards from breaking subroutines.",
+      "effects": [
+        {
+          "ice_strength": 2
+        }
+      ]
+    },
+    "pelangi": {
+      "reviewed": true,
+      "note": "Once per turn, a hosted virus counter gives the ice one chosen subtype for the encounter.",
+      "effects": [
+        {
+          "ice_gains": [
+            "barrier",
+            "code_gate",
+            "sentry"
+          ]
+        }
+      ]
+    },
+    "rime": {
+      "reviewed": true,
+      "note": "Ice protecting Rime's server.",
+      "effects": [
+        {
+          "ice_strength": 1
+        }
+      ]
+    },
+    "stegodon_mk_iv": {
+      "reviewed": true,
+      "note": "During a run in which a piece of ice was derezzed.",
+      "effects": [
+        {
+          "breaker_strength": -2
+        }
+      ]
+    },
+    "the_tungsten_tailor": {
+      "reviewed": true,
+      "effects": [
+        {
+          "ice_strength": -1
+        }
+      ]
+    },
+    "thunderbolt_armaments_peace_through_power": {
+      "reviewed": true,
+      "note": "AP and destroyer ice rezzed during a run.",
+      "effects": [
+        {
+          "ice_strength": 1,
+          "ice": [
+            "ap",
+            "destroyer"
+          ]
+        },
+        {
+          "ice_subs": 1,
+          "ice": [
+            "ap",
+            "destroyer"
+          ]
+        }
+      ]
+    }
+  }
+}

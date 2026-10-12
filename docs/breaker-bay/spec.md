@@ -50,8 +50,8 @@ could not settle. A person reviews and corrects each draft and sets `"reviewed":
 
 - The test suite and `compute` refuse to run on a curated file with an unreviewed entry (exit `1`;
   nothing is published), so a draft never reaches the site by accident.
-- A Standard breaker with no entry is published as unmodelled ("not reviewed yet") and counted in
-  the quality report; it does not stop the Market Research snapshot.
+- A Standard breaker with no entry is published as unmodelled ("not reviewed yet") and logged
+  (`breaker_bay_missing_entries`); it does not stop the Market Research snapshot.
 - Entries for cards that left the pool are kept (a card can come back) and ignored;
   `draft --prune` removes them.
 

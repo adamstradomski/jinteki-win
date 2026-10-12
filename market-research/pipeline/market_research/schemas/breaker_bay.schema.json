@@ -1,0 +1,593 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://data.jinteki.win/schemas/breaker_bay.schema.json",
+  "title": "Breaker Bay pool (mr.breaker_bay/1)",
+  "description": "The icebreakers, ice and support cards of the Standard ban list in force when the snapshot was built, with the hand-curated cost model (docs/breaker-bay/data-format.md). The page computes every cost from this file.",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "restriction",
+    "breakers",
+    "ice",
+    "support"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "description": "Schema ID and major version of this file.",
+      "const": "mr.breaker_bay/1"
+    },
+    "version": {
+      "description": "Snapshot version this file belongs to (the manifest's version).",
+      "type": "string"
+    },
+    "restriction": {
+      "description": "The Standard ban list whose card pool this is: the one in force on the snapshot date. Null when the catalog has none.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "breakers": {
+      "description": "Every icebreaker in the pool, sorted by id. Each has either a model or an unmodelled reason.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "faction",
+          "cost",
+          "mu",
+          "strength",
+          "subtypes"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/card_id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "faction": {
+            "type": "string"
+          },
+          "cost": {
+            "description": "Install cost; X for a variable cost.",
+            "$ref": "#/$defs/cost"
+          },
+          "mu": {
+            "description": "Memory cost.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "strength": {
+            "description": "Printed strength.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "subtypes": {
+            "$ref": "#/$defs/subtypes"
+          },
+          "model": {
+            "$ref": "#/$defs/breaker_model"
+          },
+          "unmodelled": {
+            "description": "Why there is no cost for this breaker (it does not fit the model, or it has no reviewed entry yet).",
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "model"
+            ]
+          },
+          {
+            "required": [
+              "unmodelled"
+            ]
+          }
+        ]
+      }
+    },
+    "ice": {
+      "description": "Every piece of ice in the pool, sorted by id.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "faction",
+          "rez",
+          "strength",
+          "subtypes",
+          "types",
+          "subs"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/card_id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "faction": {
+            "type": "string"
+          },
+          "rez": {
+            "description": "Rez cost; X for a variable cost.",
+            "$ref": "#/$defs/cost"
+          },
+          "strength": {
+            "description": "Printed strength.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "subtypes": {
+            "$ref": "#/$defs/subtypes"
+          },
+          "types": {
+            "description": "The printed subtypes icebreakers interface with: barrier, code_gate, sentry.",
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ice_type"
+            }
+          },
+          "subs": {
+            "description": "Printed subroutines (the [subroutine] lines of the card text).",
+            "type": "integer",
+            "minimum": 0
+          },
+          "model": {
+            "$ref": "#/$defs/ice_model"
+          }
+        }
+      }
+    },
+    "support": {
+      "description": "Non-breaker cards in the pool that change ice strength, ice subroutines, ice subtypes or breaker strength, sorted by id.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "side",
+          "faction",
+          "type",
+          "model"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/card_id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "corp",
+              "runner"
+            ]
+          },
+          "faction": {
+            "type": "string"
+          },
+          "type": {
+            "description": "Card type, e.g. hardware or upgrade.",
+            "type": "string"
+          },
+          "model": {
+            "$ref": "#/$defs/support_model"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "card_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]{1,80}$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]{1,64}$"
+    },
+    "cost": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "const": "X"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "subtypes": {
+      "description": "Every NetrunnerDB subtype ID of the card, sorted.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ice_type": {
+      "enum": [
+        "barrier",
+        "code_gate",
+        "sentry"
+      ]
+    },
+    "amount": {
+      "description": "A whole number, or base + the sum of each param's value times its factor + every step reached, floored at min.",
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "base": {
+              "type": "integer"
+            },
+            "per": {
+              "type": "object",
+              "propertyNames": {
+                "$ref": "#/$defs/slug"
+              },
+              "additionalProperties": {
+                "type": "integer"
+              }
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "param",
+                  "at",
+                  "add"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "param": {
+                    "$ref": "#/$defs/slug"
+                  },
+                  "at": {
+                    "type": "integer"
+                  },
+                  "add": {
+                    "type": "integer"
+                  }
+                }
+              }
+            },
+            "min": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "params": {
+      "description": "Settings of the card, keyed by param id; amounts and spends refer to them.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/slug"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "label",
+          "default",
+          "max"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "default": {
+            "type": "integer"
+          },
+          "min": {
+            "description": "Absent means 0.",
+            "type": "integer"
+          },
+          "max": {
+            "type": "integer"
+          },
+          "kind": {
+            "description": "Absent means count; a flag goes from 0 (no) to 1 (yes).",
+            "enum": [
+              "count",
+              "flag"
+            ]
+          }
+        }
+      }
+    },
+    "breaks": {
+      "description": "Ice subtypes the breaker interfaces with; any for AI.",
+      "type": "array",
+      "items": {
+        "enum": [
+          "barrier",
+          "code_gate",
+          "sentry",
+          "any"
+        ]
+      }
+    },
+    "ability": {
+      "description": "One paid ability: exactly one of break, pump, weaken, bypass, rebate. cost absent means 0.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "break": {
+          "description": "Subroutines broken per use: a number, any (any number), or X (as many as the X credits paid).",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "enum": [
+                "any",
+                "X"
+              ]
+            }
+          ]
+        },
+        "pump": {
+          "description": "Strength added per use, for the rest of the encounter.",
+          "$ref": "#/$defs/amount"
+        },
+        "weaken": {
+          "description": "Strength the ice loses per use, for the rest of the encounter.",
+          "$ref": "#/$defs/amount"
+        },
+        "bypass": {
+          "description": "The ice is passed without breaking it.",
+          "const": true
+        },
+        "rebate": {
+          "description": "Credits gained back after fully breaking the ice.",
+          "$ref": "#/$defs/amount"
+        },
+        "cost": {
+          "description": "Credits per use; X goes with break X.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/amount"
+            },
+            {
+              "const": "X"
+            }
+          ]
+        },
+        "spend": {
+          "description": "Counters (or other things a param counts) used up per use.",
+          "type": "object",
+          "required": [
+            "param"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "param": {
+              "$ref": "#/$defs/slug"
+            },
+            "n": {
+              "description": "Absent means 1.",
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "only": {
+          "description": "The ability works only on ice with one of these subtypes.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ice_type"
+          }
+        },
+        "once": {
+          "description": "Usable once per encounter, run or turn.",
+          "enum": [
+            "encounter",
+            "run",
+            "turn"
+          ]
+        }
+      }
+    },
+    "breaker_model": {
+      "type": "object",
+      "required": [
+        "breaks"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "breaks": {
+          "$ref": "#/$defs/breaks"
+        },
+        "stealth": {
+          "description": "Its abilities spend credits only from stealth cards.",
+          "type": "boolean"
+        },
+        "params": {
+          "$ref": "#/$defs/params"
+        },
+        "strength": {
+          "description": "Added to the printed strength.",
+          "$ref": "#/$defs/amount"
+        },
+        "abilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ability"
+          }
+        },
+        "variants": {
+          "description": "Alternative situations; each replaces the fields it sets. Exactly one is the default.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/slug"
+              },
+              "label": {
+                "type": "string"
+              },
+              "default": {
+                "type": "boolean"
+              },
+              "breaks": {
+                "$ref": "#/$defs/breaks"
+              },
+              "strength": {
+                "$ref": "#/$defs/amount"
+              },
+              "abilities": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ability"
+                }
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "ice_model": {
+      "description": "Corrections to the printed values of a piece of ice.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "params": {
+          "$ref": "#/$defs/params"
+        },
+        "strength": {
+          "description": "Added to the printed strength.",
+          "$ref": "#/$defs/amount"
+        },
+        "subs": {
+          "description": "Added to the printed subroutines.",
+          "$ref": "#/$defs/amount"
+        },
+        "gains": {
+          "description": "Subtypes it has during play besides the printed ones.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ice_type"
+          }
+        },
+        "broken_only_by": {
+          "description": "Only breakers with one of these subtypes can break its subroutines.",
+          "type": "array",
+          "items": {
+            "enum": [
+              "fracter",
+              "decoder",
+              "killer",
+              "ai"
+            ]
+          }
+        },
+        "unbreakable": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "support_model": {
+      "type": "object",
+      "required": [
+        "effects"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "params": {
+          "$ref": "#/$defs/params"
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "description": "Exactly one of ice_strength, ice_subs, ice_gains, breaker_strength.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "ice_strength": {
+                "$ref": "#/$defs/amount"
+              },
+              "ice_subs": {
+                "$ref": "#/$defs/amount"
+              },
+              "ice_gains": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ice_type"
+                }
+              },
+              "breaker_strength": {
+                "$ref": "#/$defs/amount"
+              },
+              "ice": {
+                "description": "An ice effect reaches only ice with one of these subtypes (any ice when absent).",
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/slug"
+                }
+              },
+              "breakers": {
+                "description": "Which breakers a breaker effect reaches; absent means all.",
+                "enum": [
+                  "all",
+                  "non_ai"
+                ]
+              }
+            }
+          }
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

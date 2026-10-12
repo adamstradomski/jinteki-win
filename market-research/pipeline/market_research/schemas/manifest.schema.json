@@ -182,7 +182,8 @@
         "quality",
         "summary_cut",
         "trends_cut",
-        "tournaments"
+        "tournaments",
+        "breaker_bay"
       ],
       "additionalProperties": false,
       "properties": {
@@ -216,6 +217,10 @@
         },
         "tournaments": {
           "description": "The tournaments a ban list and tier group counts, the same for both sides (mr.tournaments).",
+          "type": "string"
+        },
+        "breaker_bay": {
+          "description": "Breaker Bay's breakers, ice and support cards of the Standard ban list in force (mr.breaker_bay).",
           "type": "string"
         }
       }

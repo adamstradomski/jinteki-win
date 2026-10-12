@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
+import shutil
 import threading
 import time
 from dataclasses import replace
@@ -58,6 +59,7 @@ def test_snapshot_is_valid(built):
         "identities": "identities",
         "report": "quality",
         "tournaments": "tournaments",
+        "pool": "breaker_bay",
     }
     for path, obj in snap.files.items():
         kind = "catalog" if path == PATHS["catalog"] else names[path.rsplit("/", 1)[1][:-5]]
@@ -81,7 +83,7 @@ def test_every_slice_path_exists_and_is_deterministic(built):
     expected = (
         2 * len(m["restrictions"]) * len(m["tier_groups"]) * 5
         + len(m["restrictions"]) * len(m["tier_groups"])
-        + 2
+        + 3  # catalog, quality report, Breaker Bay
     )
     assert len(snap.files) == expected
     assert m["base_path"] == f"v={m['version']}/"
@@ -252,7 +254,16 @@ def _strings(o):
 
 
 def test_docs_contract_matches_package_schemas():
-    for name in ("manifest", "summary", "trends", "identities", "catalog", "quality", "tournaments"):
+    for name in (
+        "manifest",
+        "summary",
+        "trends",
+        "identities",
+        "catalog",
+        "quality",
+        "tournaments",
+        "breaker_bay",
+    ):
         doc = json.loads((DOCS / f"{name}.schema.json").read_text())
         assert doc == schema(name), name
     for ex in sorted(DOCS.glob("examples/*.json")):
@@ -341,3 +352,21 @@ def test_failed_upload_raises_and_keeps_the_old_manifest(built, tmp_path):
     assert "manifest.json" not in store.puts
     assert store.get("manifest.json") == old
     assert bad not in store.puts
+
+
+def test_an_unreviewed_breaker_bay_entry_stops_publishing(fixture_run, tmp_path, monkeypatch):
+    from market_research import breaker_bay
+
+    env, _, _, _ = fixture_run
+    stores = replace(env.stores, published=LocalObjectStore(tmp_path / "published"))
+    cur = tmp_path / "curated"
+    shutil.copytree(breaker_bay.default_dir(), cur)
+    raw = json.loads((cur / "breakers.json").read_text("utf-8"))
+    raw["cards"]["corsair"]["reviewed"] = False
+    (cur / "breakers.json").write_text(json.dumps(raw), "utf-8")
+    monkeypatch.setattr(breaker_bay, "default_dir", lambda: cur)
+    snap, errors = build(stores, env.settings, env.clock.now())
+    assert errors == ["breaker-bay: not reviewed: breakers:corsair"]
+    with pytest.raises(PublishError):
+        publish(stores, snap, errors)
+    assert not stores.published.exists("manifest.json")

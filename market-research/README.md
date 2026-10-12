@@ -44,6 +44,7 @@ market-research/
     imports.py                `import-decks`: decklist files matched to Cobra players
     normalize.py, catalog.py  canonical Parquet tables, linking, legality
     metrics.py, publish.py    additive counts, snapshot slices, validation, publishing
+    breaker_bay.py            Breaker Bay's curated cost data, its pool slice and drafts
     runner.py, cli.py         run-all, backfill phases and --plan, CLI
     config.py, clock.py       settings from environment variables, injectable clock
     storage.py, db.py         R2 and local object stores, DuckDB bulk inserts
@@ -52,6 +53,7 @@ market-research/
     fixtures_refresh.py       `fixtures refresh`: capture one live tournament as fixtures
     schemas/                  JSON Schemas of the snapshot contract
     data/tiers.json           the tier-group mapping (the one place it lives)
+    data/breaker_bay/         Breaker Bay's hand-curated breakers, ice and support cards
   tests/                      offline tests (network disabled) and anonymised fixtures
   Dockerfile, requirements.lock, .env.example
 ```
@@ -226,6 +228,7 @@ market-research backfill [--since YYYY-MM-DD] [--plan] [--phase 1|2|3] [--dry-ru
 market-research backfill --cobra ID ... --abr ID ... [--dry-run]    # reload single tournaments
 market-research import-decks FILE --cobra ID [--origin LABEL] [--check]   # load decklists from a file
 market-research report                                     # print the latest quality report
+market-research breaker-bay draft [--prune] [--dir DIR]    # draft Breaker Bay entries for review
 market-research fixtures refresh --cobra ID | --abr ID [--out DIR]   # manual only
 ```
 
@@ -262,6 +265,7 @@ An empty value means the default; a number that doesn't parse stops the command 
 | `import-decks FILE --cobra ID` | Loads a tournament's decklists from a file into `import/cobra/<id>.json` (see [Importing decklists](#importing-decklists)), then normalizes and publishes once. | Cobra (the tournament's export, once) | the import record, canonical tables | yes, once (not with `--check`) | yes |
 | `backfill --plan` | Makes only the listing requests and prints requests and estimated duration per host and phase. | listings only | nothing but its log | no | yes |
 | `report` | Prints the latest published `quality/report.json`. | none | nothing | no | no |
+| `breaker-bay draft` | Adds draft entries, marked not reviewed, to Breaker Bay's curated files for the Standard breakers, ice and support-card candidates they don't cover yet (see [Breaker Bay](#breaker-bay)). | none (reads the stored catalog) | the curated files in `--dir` | no | no |
 | `fixtures refresh` | Fetches one live tournament, anonymises it with canaries and writes fixture files for review. | the chosen host | files in `--out` only | no | no |
 
 Options:
@@ -282,14 +286,39 @@ Options:
 | `--check` | `import-decks` | Match and report only: writes no record and publishes nothing. |
 | `--cobra ID` / `--abr ID` | `fixtures refresh` | The tournament to capture; give exactly one. |
 | `--out DIR` | `fixtures refresh` | Output directory (default `tests/fixtures/refresh`). |
+| `--dir DIR` | `breaker-bay draft` | The curated files' directory (default: the package's `data/breaker_bay/`, which is `pipeline/market_research/data/breaker_bay/` in an editable install). Missing files count as empty. |
+| `--prune` | `breaker-bay draft` | Also remove entries for cards no longer in the Standard pool (otherwise they are only listed). |
 | `--fixtures DIR` (hidden) | `ingest`, `normalize`, `run-all`, `backfill`, `report`, `import-decks` | Serve every HTTP request from a recorded fixture directory. Development and tests only. |
-| `--now ISO-TIME` (hidden) | `ingest`, `normalize`, `compute`, `run-all`, `backfill`, `import-decks` | Pin the clock, e.g. `2026-09-27T04:00:00Z`. Development and tests only. |
+| `--now ISO-TIME` (hidden) | `ingest`, `normalize`, `compute`, `run-all`, `backfill`, `import-decks`, `breaker-bay draft` | Pin the clock, e.g. `2026-09-27T04:00:00Z`. Development and tests only. |
 
 Exit codes: `0` success, `2` partial (a host tripped its circuit breaker, publish still happened),
 `1` failure (nothing published; the previous manifest stays live). `report` exits `1` when nothing
 has been published yet. `import-decks` exits `1`, writing nothing, when the file can't be read, the
 tournament, its players or the card catalog aren't stored, Cobra's export can't be fetched, or no
-deck in the file matched.
+deck in the file matched. `breaker-bay draft` exits `0` whether or not it drafted anything, and `1`,
+writing nothing, when no card catalog is stored or a curated file can't be read.
+
+### Breaker Bay
+
+Every snapshot also carries `breaker-bay/pool.json` for the [Breaker Bay](../docs/breaker-bay/spec.md)
+page: the icebreakers, ice and support cards of the Standard ban list in force on the run date, with
+the hand-curated cost model from `pipeline/market_research/data/breaker_bay/`
+([format](../docs/breaker-bay/data-format.md)).
+
+- **An unreviewed entry stops publishing.** While any curated entry has `"reviewed": false` or
+  `uncertain` fields, `compute` (and `run-all`) publish nothing and exit `1`, and the tests fail.
+- **A new breaker never stops publishing.** A Standard icebreaker without an entry is published as
+  unmodelled ("Not reviewed yet") and logged as `breaker_bay_missing_entries`.
+- **After a new set or ban list:**
+
+  ```sh
+  market-research breaker-bay draft             # adds drafts for what the files don't cover
+  # review each draft in data/breaker_bay/*.json, then set "reviewed": true
+  uv run pytest tests/test_breaker_bay.py       # fails while a draft is left unreviewed
+  ```
+
+  `draft` reads the stored NetrunnerDB catalog, so it needs `MR_LOCAL_STORE` or the R2 settings like
+  the other commands. Cards that left the pool are listed; `--prune` removes their entries.
 
 ### Importing decklists
 
