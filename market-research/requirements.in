@@ -1,10 +1,10 @@
 httpx==0.28.1
-pydantic==2.13.5
-selectolax==0.4.13
-duckdb==1.5.6
-boto3==1.43.106
-typer==0.27.2
+pydantic==2.14.1
+selectolax==1.0.2
+duckdb==2.0.0
+boto3==1.43.117
+typer==0.27.3
 structlog==26.1.0
 jsonschema==4.26.0
 # Build backend for installing this package without build isolation (hash-pinned like the rest).
-setuptools==84.0.0
+setuptools==84.2.1
