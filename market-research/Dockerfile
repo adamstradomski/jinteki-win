@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Market Research batch runner. Stateless: every run reads and writes R2 only.
 # Base image pinned by digest; Dependabot/Renovate keeps it current.
-FROM python:3.12-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f AS build
+FROM python:3.15-slim@sha256:94d3426f1def7db4a106a232ac121bfd975393e5dfd40a619b955fae45fe7913 AS build
 
 ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1 PYTHONDONTWRITEBYTECODE=1
 RUN python -m venv /opt/venv
@@ -18,7 +18,7 @@ COPY pipeline /src/pipeline
 # The package adds no dependencies of its own: everything above came from the hash-pinned lock.
 RUN pip install --no-deps --no-build-isolation /src
 
-FROM python:3.12-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f
+FROM python:3.15-slim@sha256:94d3426f1def7db4a106a232ac121bfd975393e5dfd40a619b955fae45fe7913
 
 ENV PATH=/opt/venv/bin:$PATH \
     PYTHONDONTWRITEBYTECODE=1 \
